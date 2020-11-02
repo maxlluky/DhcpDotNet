@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hex to Bytes", "Hex to Byte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DHCP Release Attack", "DHCP Release Attack\DHCP Release Attack.csproj", "{5E0A7500-1C1A-4A4E-8AC0-20E4EE2784B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DHCP Discover", "DHCP Discover\DHCP Discover.csproj", "{66609CDB-631E-438D-86B6-B6C7DD667A5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5E0A7500-1C1A-4A4E-8AC0-20E4EE2784B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E0A7500-1C1A-4A4E-8AC0-20E4EE2784B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E0A7500-1C1A-4A4E-8AC0-20E4EE2784B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66609CDB-631E-438D-86B6-B6C7DD667A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66609CDB-631E-438D-86B6-B6C7DD667A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66609CDB-631E-438D-86B6-B6C7DD667A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66609CDB-631E-438D-86B6-B6C7DD667A5E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
