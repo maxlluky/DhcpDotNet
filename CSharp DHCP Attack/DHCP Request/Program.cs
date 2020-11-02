@@ -32,6 +32,7 @@ namespace DHCP_Request
 
             DhcpRequestPacket dhcpRequestPacket = new DhcpRequestPacket()
             {
+                dhcpMessageType = new byte[] { 0x03 },
                 transactionID = _tempTransactionId,
                 dhcpServerId = IPAddress.Parse("192.168.178.1").GetAddressBytes(),
             };

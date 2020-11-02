@@ -48,8 +48,12 @@ class DhcpRequestPacket
     //--magicCookie : 
     public byte[] magicCookie { get; set; } = new byte[4] { 0x63, 0x82, 0x53, 0x63 };
 
-    //--dhcpMessageType (Request)
-    public byte[] dhcpMessageType { get; set; } = new byte[3] { 0x35, 0x01, 0x03 };
+    //--GROUP OPTION DHCP Message Type      --------------------------------------------------------------------------
+    private byte[] optDhcpMessageType = new byte[1] { 0x35 };
+    private byte[] dhcpMessageTypeLength = new byte[1] { 0x01 };
+    //--dhcpMessageType (Discover)
+    public byte[] dhcpMessageType { get; set; } = new byte[1] { 0x00 };
+    //--END GROUP DHCP Message Type         --------------------------------------------------------------------------
 
     //--GROUP OPTION Client Identifier      --------------------------------------------------------------------------
     //--clientIdentifier
@@ -96,6 +100,6 @@ class DhcpRequestPacket
 
     public byte[] buildPacket()
     {
-        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpMessageType).Concat(optClientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdentifier).Concat(requestedIPpre).Concat(requestedIP).Concat(optDhcpServerId).Concat(dhcpServerIdLength).Concat(dhcpServerId).Concat(optHostName).Concat(hostNameLength).Concat(hostName).Concat(clientFQDN).Concat(vendorClassIndentifier).Concat(parameterRequestList).Concat(end).ToArray();
+        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(optDhcpMessageType).Concat(dhcpMessageTypeLength).Concat(dhcpMessageType).Concat(optClientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdentifier).Concat(requestedIPpre).Concat(requestedIP).Concat(optDhcpServerId).Concat(dhcpServerIdLength).Concat(dhcpServerId).Concat(optHostName).Concat(hostNameLength).Concat(hostName).Concat(clientFQDN).Concat(vendorClassIndentifier).Concat(parameterRequestList).Concat(end).ToArray();
     }
 }

@@ -32,6 +32,7 @@ namespace DHCP_Discover
 
             DhcpDiscoveryPacket dhcpDiscoveryPacket = new DhcpDiscoveryPacket()
             {
+                dhcpMessageType = new byte[] { 0x01 },
                 transactionID = _tempTransactionId,
             };
 

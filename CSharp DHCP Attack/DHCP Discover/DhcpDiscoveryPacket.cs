@@ -44,11 +44,14 @@ class DhcpDiscoveryPacket
     //--magicCookie : 
     public byte[] magicCookie { get; set; } = new byte[4] { 0x63, 0x82, 0x53, 0x63 };
 
+    //--GROUP OPTION DHCP Message Type      --------------------------------------------------------------------------
+    private byte[] optDhcpMessageType = new byte[1] { 0x35 };
+    private byte[] dhcpMessageTypeLength = new byte[1] { 0x01 };
     //--dhcpMessageType (Discover)
-    public byte[] dhcpMessageType { get; set; } = new byte[3] { 0x35, 0x01, 0x01 };
+    public byte[] dhcpMessageType { get; set; } = new byte[1] { 0x00 };
+    //--END GROUP DHCP Message Type         --------------------------------------------------------------------------
 
     //--GROUP OPTION Client Identifier      --------------------------------------------------------------------------
-    //--clientIdentifier
     private byte[] optClientId = new byte[1] { 0x3d };
     private byte[] clientIdLength = new byte[1] { 0x07 };
     private byte[] clientIdHwType = new byte[1] { 0x01 };
@@ -62,7 +65,7 @@ class DhcpDiscoveryPacket
     public byte[] hostNameLength { get; set; } = new byte[1] { 0x06 };
 
     //--hostName : hostname of the client
-    public byte[] hostName { get; set; } = new byte[6] { 0x43, 0x73, 0x68, 0x61, 0x72, 0x70 };
+    public byte[] hostName { get; set; } = new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     //--GROUP END Hostname                   --------------------------------------------------------------------------
 
     //--vendorClassIndentifier
@@ -76,6 +79,6 @@ class DhcpDiscoveryPacket
 
     public byte[] buildPacket()
     {
-        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpMessageType).Concat(optClientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdentifier).Concat(optHostName).Concat(hostNameLength).Concat(hostName).Concat(vendorClassIndentifier).Concat(parameterRequestList).Concat(end).ToArray();
+        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(optDhcpMessageType).Concat(dhcpMessageTypeLength).Concat(dhcpMessageType).Concat(optClientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdentifier).Concat(optHostName).Concat(hostNameLength).Concat(hostName).Concat(vendorClassIndentifier).Concat(parameterRequestList).Concat(end).ToArray();
     }
 }
