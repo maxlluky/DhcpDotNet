@@ -18,7 +18,7 @@ namespace DHCP_Discover
 
             if (sock.SendTo(send_buffer, endPoint) != 0)
             {
-                Console.WriteLine("Send successful");
+                Console.WriteLine("Send successful. See Wireshark output: DHCP Discovery with option Hostname: Csharp");
             }
 
             Console.Read();
