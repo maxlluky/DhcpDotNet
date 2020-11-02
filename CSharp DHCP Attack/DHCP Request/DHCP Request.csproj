@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{11319D7C-3F9C-46E0-8B57-33722FA98580}</ProjectGuid>
+    <ProjectGuid>{F7111E96-184E-4C20-A374-1088BAD10A46}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Hex_to_Text</RootNamespace>
-    <AssemblyName>Hex to Text</AssemblyName>
+    <RootNamespace>DHCP_Request</RootNamespace>
+    <AssemblyName>DHCP Request</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DhcpRequestPacket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

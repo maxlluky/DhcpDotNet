@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-class DhcpReleasePacket
+class DhcpRequestPacket
 {
     //-- MessageType, HardwareType, Hardware-Address-Length
     public byte[] firstPart { get; set; } = new byte[3] { 0x01, 0x01, 0x06 };
@@ -45,33 +49,53 @@ class DhcpReleasePacket
     public byte[] magicCookie { get; set; } = new byte[4] { 0x63, 0x82, 0x53, 0x63 };
 
     //--dhcpMessageType (Request)
-    private byte[] dhcpMessageType = new byte[3] { 0x35, 0x01, 0x07 };
-
-    //--GROUP OPTION DHCP Server Identifier  --------------------------------------------------------------------------
-    private byte[] dhcpSerId = new byte[1] { 0x36 };
-    private byte[] dhcpServIdLength = new byte[1] { 0x04 };
-
-    //--dhcpServerIdValue : DHCP Server IP-Address in hex
-    public byte[] dhcpServIdValue { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
-    //--END GROUP DHCP Server Identifier    --------------------------------------------------------------------------
+    public byte[] dhcpMessageType { get; set; } = new byte[3] { 0x35, 0x01, 0x03 };
 
     //--GROUP OPTION Client Identifier      --------------------------------------------------------------------------
-    private byte[] clientId = new byte[1] { 0x3d };
+    //--clientIdentifier
+    private byte[] optClientId = new byte[1] { 0x3d };
     private byte[] clientIdLength = new byte[1] { 0x07 };
     private byte[] clientIdHwType = new byte[1] { 0x01 };
 
-    //--clientIdValue : Hardware-Type (1Byte) + Client MAC-Address in hex (6Byte)
-    public byte[] clientIdValue { get; set; } = new byte[6] {  0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    //--clientIdentifier : Client MAC-Address in Option
+    public byte[] clientIdentifier { get; set; } = new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     //--END GROUP Client Identifier         --------------------------------------------------------------------------
 
-    //--end
-    private byte[] end = new byte[1] { 0xff };
+    //--requestedIP
+    private byte[] requestedIPpre = new byte[2] { 0x32, 0x04 };
 
-    //--padding
-    byte[] padding = new byte[41] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    //--requestedIP (change this to dest-IP)
+    public byte[] requestedIP { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+
+    //--GROUP OPTION dhcpServerIdentifier   --------------------------------------------------------------------------
+    private byte[] optDhcpServerId = new byte[1] { 0x36 };
+    private byte[] dhcpServerIdLength = new byte[1] { 0x04 };
+    //--dhcpServerIdentifier
+    public byte[] dhcpServerId { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+    //--END GROUP dhcpServerIdentifier      --------------------------------------------------------------------------
+
+    //--GROUP Hostname                      --------------------------------------------------------------------------
+    private byte[] optHostName = new byte[1] { 0x0C };
+    public byte[] hostNameLength { get; set; } = new byte[1] { 0x06 };
+
+    //--hostName : hostname of the client
+    public byte[] hostName { get; set; } = new byte[6] { 0x43, 0x73, 0x68, 0x61, 0x72, 0x70 };
+    //--END GROUP Hostname                  --------------------------------------------------------------------------
+
+    //--clientFQDN
+    public byte[] clientFQDN = new byte[11] { 0x51, 0x09, 0x00, 0x00, 0x00, 0x70, 0x63, 0x5f, 0x6d, 0x61, 0x78 };
+
+    //--vendorClassIndentifier
+    public byte[] vendorClassIndentifier { get; set; } = new byte[10] { 0x3c, 0x08, 0x4d, 0x53, 0x46, 0x54, 0x20, 0x35, 0x2e, 0x30 };
+
+    //--parameterRequestList
+    public byte[] parameterRequestList { get; set; } = new byte[16] { 0x37, 0x0e, 0x01, 0x03, 0x06, 0x0f, 0x1f, 0x21, 0x2b, 0x2c, 0x2e, 0x2f, 0x77, 0x79, 0xf9, 0xfc };
+    
+    //--end
+    public byte[] end { get; set; } = new byte[1] { 0xff };
 
     public byte[] buildPacket()
-    {        
-        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpMessageType).Concat(dhcpSerId).Concat(dhcpServIdLength).Concat(dhcpServIdValue).Concat(clientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdValue).Concat(end).Concat(padding).ToArray();
+    {
+        return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpMessageType).Concat(optClientId).Concat(clientIdLength).Concat(clientIdHwType).Concat(clientIdentifier).Concat(requestedIPpre).Concat(requestedIP).Concat(optDhcpServerId).Concat(dhcpServerIdLength).Concat(dhcpServerId).Concat(optHostName).Concat(hostNameLength).Concat(hostName).Concat(clientFQDN).Concat(vendorClassIndentifier).Concat(parameterRequestList).Concat(end).ToArray();
     }
 }
