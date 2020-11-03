@@ -5,10 +5,17 @@
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using SharpPcap
 
 ## NuGet
-<a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
+Package Manager
 ```
 PM> Install-Package DhcpDotNet -Version 1.0.7
 ```
+
+.NET CLI
+```
+> dotnet add package DhcpDotNet --version 1.0.7
+```
+<a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
+
 ## Usage
 Example of a DHCP Discover package. The payload can be sent with a UdpClient or socket.
 ```csharp
