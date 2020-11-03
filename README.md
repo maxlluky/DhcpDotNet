@@ -1,2 +1,2 @@
-# DHCP Attacks
- DHCP Attacks implemented with C#
+# DHCPDotNet
+ DHCP packet implemented with C#
