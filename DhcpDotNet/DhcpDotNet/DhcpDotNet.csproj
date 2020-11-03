@@ -1,17 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Authors>Calysoft</Authors>
+    <Authors>Marschall TM</Authors>
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Marschall-dev/DhcpDotNet</RepositoryUrl>
-    <Version>1.0.3</Version>
+    <Version>1.0.6</Version>
     <PackageTags>DHCP, DHCP Packet, DHCP Server, DHCP Client, Dynamic Host Configuration Protocol</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
-    <PackageIcon></PackageIcon>
+    <PackageIcon>empty-white-box.png</PackageIcon>
+    <Description>Fully managed, cross platform (Windows, Mac, Linux) .NET library for creating DHCP packets</Description>
+    <PackageProjectUrl>https://github.com/Marschall-dev/DhcpDotNet</PackageProjectUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\empty-white-box.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

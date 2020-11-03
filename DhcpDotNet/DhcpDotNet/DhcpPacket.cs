@@ -118,6 +118,12 @@ namespace DhcpDotNet
                 case (dhcpOptionIds)16:
                     optionIdBytes = new byte[] { 0x1c };
                     break;
+                case (dhcpOptionIds)17:
+                    optionIdBytes = new byte[] { 0x2a };
+                    break;
+                case (dhcpOptionIds)18:
+                    optionIdBytes = new byte[] { 0x9e };
+                    break;
             }
 
             return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
@@ -142,5 +148,7 @@ namespace DhcpDotNet
         VendorClassIdentifier = 14,
         ParameterRequestList = 15,
         BroadcastAddress = 16,
+        NetworkTimeProtocolServers = 17,
+        PCPServer = 18,
     }
 }
