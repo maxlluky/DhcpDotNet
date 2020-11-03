@@ -12,20 +12,20 @@ Example of a DHCP Discover package. The payload can be sent with a UdpClient or 
 ```csharp
 private static byte[] buildDhcpPayload()
 {
-  DhcpOption dhcpServerIdentifierOption = new DhcpOption()
-  {
-    optionId = dhcpOptionIds.DhcpMessageType,
-    optionLength = new byte[] { 0x01 },
-    optionValue = new byte[] { 0x01 },
-  };
+    DhcpOption dhcpServerIdentifierOption = new DhcpOption()
+    {
+        optionId = dhcpOptionIds.DhcpMessageType,
+        optionLength = new byte[] { 0x01 },
+        optionValue = new byte[] { 0x01 },
+    };
 
 
-  DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
-  {
-    transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-    dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption().ToArray(),
-  };
+    DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
+    {
+        transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
+        dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption().ToArray(),
+    };
 
-  return dhcpDiscoveryPacket.buildPacket();
+    return dhcpDiscoveryPacket.buildPacket();
 }
 ```
