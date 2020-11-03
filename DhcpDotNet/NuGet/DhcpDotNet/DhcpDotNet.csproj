@@ -7,7 +7,11 @@
     <Authors>Calysoft</Authors>
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Marschall-dev/DHCP-Attacks</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Marschall-dev/DhcpDotNet</RepositoryUrl>
+    <Version>1.0.2</Version>
+    <PackageTags>DHCP, DHCP Packet, DHCP Server, DHCP Client, Dynamic Host Configuration Protocol</PackageTags>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageIcon></PackageIcon>
   </PropertyGroup>
 
 </Project>
