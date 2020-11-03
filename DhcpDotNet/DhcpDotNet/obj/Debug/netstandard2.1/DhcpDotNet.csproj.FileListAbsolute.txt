@@ -1,0 +1,9 @@
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\bin\Debug\netstandard2.1\DhcpDotNet.deps.json
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\bin\Debug\netstandard2.1\DhcpDotNet.dll
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\bin\Debug\netstandard2.1\DhcpDotNet.pdb
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.csprojAssemblyReference.cache
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.AssemblyInfoInputs.cache
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.AssemblyInfo.cs
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.csproj.CoreCompileInputs.cache
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.dll
+G:\Desktop\DhcpDotNet\DhcpDotNet\DhcpDotNet\obj\Debug\netstandard2.1\DhcpDotNet.pdb

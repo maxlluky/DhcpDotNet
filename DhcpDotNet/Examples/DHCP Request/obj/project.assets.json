@@ -1,70 +1,14 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.8": {
-      "DhcpDotNet/1.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win": {
-      "DhcpDotNet/1.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win-x64": {
-      "DhcpDotNet/1.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        }
-      }
-    },
-    ".NETFramework,Version=v4.8/win-x86": {
-      "DhcpDotNet/1.0.5": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/DhcpDotNet.dll": {}
-        }
-      }
-    }
+    ".NETFramework,Version=v4.8": {},
+    ".NETFramework,Version=v4.8/win": {},
+    ".NETFramework,Version=v4.8/win-x64": {},
+    ".NETFramework,Version=v4.8/win-x86": {}
   },
-  "libraries": {
-    "DhcpDotNet/1.0.5": {
-      "sha512": "SHzbuGTTiS23gxsdtGYPI81IBKvflGMg+r0fLNGZ2aoroRGeHKfqs8cJmqVf2uXegAFobMPWweu0NXMgK73vXg==",
-      "type": "package",
-      "path": "dhcpdotnet/1.0.5",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "dhcpdotnet.1.0.5.nupkg.sha512",
-        "dhcpdotnet.nuspec",
-        "empty-white-box.png",
-        "lib/netstandard2.0/DhcpDotNet.dll"
-      ]
-    }
-  },
+  "libraries": {},
   "projectFileDependencyGroups": {
-    ".NETFramework,Version=v4.8": [
-      "DhcpDotNet >= 1.0.5"
-    ]
+    ".NETFramework,Version=v4.8": []
   },
   "packageFolders": {
     "C:\\Users\\mluck\\.nuget\\packages\\": {}
@@ -97,14 +41,7 @@
       }
     },
     "frameworks": {
-      "net48": {
-        "dependencies": {
-          "DhcpDotNet": {
-            "target": "Package",
-            "version": "[1.0.5, )"
-          }
-        }
-      }
+      "net48": {}
     },
     "runtimes": {
       "win": {

@@ -32,14 +32,7 @@
         }
       },
       "frameworks": {
-        "net48": {
-          "dependencies": {
-            "DhcpDotNet": {
-              "target": "Package",
-              "version": "[1.0.5, )"
-            }
-          }
-        }
+        "net48": {}
       },
       "runtimes": {
         "win": {
