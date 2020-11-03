@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 
-namespace DHCPDotNet
+namespace DhcpDotNet
 {
-    class DhcpPacket
+    public class DhcpPacket
     {
         //-- MessageType, HardwareType, Hardware-Address-Length
         public byte[] firstPart { get; set; } = new byte[3] { 0x01, 0x01, 0x06 };
@@ -59,7 +59,7 @@ namespace DHCPDotNet
         }
     }
 
-    class DhcpOption
+    public class DhcpOption
     {
         public dhcpOptionIds optionId { get; set; } = new dhcpOptionIds();
         private byte[] optionIdBytes = new byte[] { };
