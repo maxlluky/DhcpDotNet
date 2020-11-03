@@ -6,7 +6,9 @@ See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examp
 
 ## NuGet
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
-
+```
+Install-Package DhcpDotNet -Version 1.0.7
+```
 ## Usage
 Example of a DHCP Discover package. The payload can be sent with a UdpClient or socket.
 ```csharp
