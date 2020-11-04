@@ -1,5 +1,36 @@
 # DhcpDotNet
  DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
+ 
+ ## Packet interpretation
+ the following dhcp messages can be created:
+- DHCPDISCOVER
+- DHCPOFFER
+- DHCPREQUEST
+- DHCPACK
+- DHCPNAK
+- DHCPDECLINE
+- DHCPRELEASE
+- DHCPINFORM
+    
+ the following options can be created for a DHCP packet: 
+- DhcpMessageType
+- ClientIdentifier
+- RequestedIpAddress
+- DhcpServerIdentifier
+- IpAddressLeaseTime
+- RenewalTimeValue
+- RebindingTimeValue
+- SubnetMask
+- Router
+- DomainNameServer
+- DomainName
+- Hostname
+- ClientFullyQualifiedDomainName
+- VendorClassIdentifier
+- ParameterRequestList
+- BroadcastAddress
+- NetworkTimeProtocolServers
+- PCPServer
 
 ## Examples
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet
