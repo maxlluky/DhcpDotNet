@@ -1,5 +1,5 @@
 # DhcpDotNet
- DHCP packet implemented with C#
+ DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
 
 ## Examples
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet
