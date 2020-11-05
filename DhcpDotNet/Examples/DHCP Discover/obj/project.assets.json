@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     ".NETFramework,Version=v4.8": {
-      "DhcpDotNet/1.0.7": {
+      "DhcpDotNet/1.0.9": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/DhcpDotNet.dll": {}
@@ -13,7 +13,7 @@
       }
     },
     ".NETFramework,Version=v4.8/win": {
-      "DhcpDotNet/1.0.7": {
+      "DhcpDotNet/1.0.9": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/DhcpDotNet.dll": {}
@@ -24,7 +24,7 @@
       }
     },
     ".NETFramework,Version=v4.8/win-x64": {
-      "DhcpDotNet/1.0.7": {
+      "DhcpDotNet/1.0.9": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/DhcpDotNet.dll": {}
@@ -35,7 +35,7 @@
       }
     },
     ".NETFramework,Version=v4.8/win-x86": {
-      "DhcpDotNet/1.0.7": {
+      "DhcpDotNet/1.0.9": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/DhcpDotNet.dll": {}
@@ -47,23 +47,23 @@
     }
   },
   "libraries": {
-    "DhcpDotNet/1.0.7": {
-      "sha512": "FAE+cuIownqF6HMzeMlAjKFusoNzM+YZRcb9nt/djTWvsCr5NqHEh1SOMheU6ALm2Xh0ffBm7LkVYSLAZuyhMg==",
+    "DhcpDotNet/1.0.9": {
+      "sha512": "pdFb9Z7dGJ5HT2jt8OJBGtoKsPbD5nx6ZT8Lr2QkBlB87BTy5N8FfVXAAWAkhvs+jpUzw1f5pqIeIgpZvdskJA==",
       "type": "package",
-      "path": "dhcpdotnet/1.0.7",
+      "path": "dhcpdotnet/1.0.9",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "dhcpdotnet.1.0.7.nupkg.sha512",
+        "dhcpdotnet.1.0.9.nupkg.sha512",
         "dhcpdotnet.nuspec",
-        "empty-white-box.png",
-        "lib/netstandard2.0/DhcpDotNet.dll"
+        "lib/netstandard2.0/DhcpDotNet.dll",
+        "logo.png"
       ]
     }
   },
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
-      "DhcpDotNet >= 1.0.7"
+      "DhcpDotNet >= 1.0.9"
     ]
   },
   "packageFolders": {
@@ -101,7 +101,7 @@
         "dependencies": {
           "DhcpDotNet": {
             "target": "Package",
-            "version": "[1.0.7, )"
+            "version": "[1.0.9, )"
           }
         }
       }

@@ -33,8 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DhcpDotNet, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DhcpDotNet.1.0.7\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
+    <Reference Include="DhcpDotNet, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DhcpDotNet.1.0.9\lib\netstandard2.0\DhcpDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

