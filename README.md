@@ -1,4 +1,4 @@
-# DhcpDotNet
+# DhcpDotNet <img src="DhcpDotNet/logo.png">
  DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
  
  ## Packet interpretation
