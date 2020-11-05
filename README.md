@@ -1,4 +1,4 @@
-<img src="/Marschall-dev/DhcpDotNet/raw/main/DhcpDotNet/logo.png" style="max-width:5%;">
+<img src="DhcpDotNet/logo.png" style="max-width:5%;">
 
 # DhcpDotNet
 DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
