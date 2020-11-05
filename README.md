@@ -56,7 +56,7 @@ DhcpOption dhcpServerIdentifierOption = new DhcpOption()
 DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
 {
     transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-    dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption().ToArray(),
+    dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption(),
 };
 
 byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
