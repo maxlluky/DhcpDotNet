@@ -1,8 +1,12 @@
+<a>
+    <img src="DhcpDotNet/logo.png" alt="DhcpDotNet" align="right" height="60" />
+</a>
+
 # DhcpDotNet
- DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
+DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
  
- ## Packet interpretation
- the following dhcp messages can be created:
+## Packet interpretation
+the following dhcp messages can be created:
 - DHCPDISCOVER
 - DHCPOFFER
 - DHCPREQUEST
@@ -12,7 +16,7 @@
 - DHCPRELEASE
 - DHCPINFORM
     
- the following options can be created for a DHCP packet: 
+the following options can be created for a DHCP packet: 
 - DhcpMessageType
 - ClientIdentifier
 - RequestedIpAddress
