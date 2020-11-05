@@ -123,7 +123,7 @@ Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolT
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
 IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
 
-DhcpOption dhcpServerIdentifierOption = new DhcpOption()
+DhcpOption dhcpMessageTypeOption = new DhcpOption()
 {
     optionId = dhcpOptionIds.DhcpMessageType,
     optionLength = new byte[] { 0x01 },
