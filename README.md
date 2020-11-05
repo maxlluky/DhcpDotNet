@@ -3,7 +3,8 @@
 </a>
 
 # DhcpDotNet
-DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
+DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities.
+DhcpDotNet allows the programming of a DHCP server, clients with full controller for C#. 
  
 ## Packet interpretation
 the following dhcp messages can be created:
