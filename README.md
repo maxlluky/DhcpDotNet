@@ -42,24 +42,26 @@ See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examp
 ## Usage
 Example of a DHCP Discover package. The payload can be sent with a UdpClient or socket.
 ```csharp
-private static byte[] buildDhcpPayload()
+Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
+IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
+
+DhcpOption dhcpServerIdentifierOption = new DhcpOption()
 {
-    DhcpOption dhcpServerIdentifierOption = new DhcpOption()
-    {
-        optionId = dhcpOptionIds.DhcpMessageType,
-        optionLength = new byte[] { 0x01 },
-        optionValue = new byte[] { 0x01 },
-    };
+    optionId = dhcpOptionIds.DhcpMessageType,
+    optionLength = new byte[] { 0x01 },
+    optionValue = new byte[] { 0x01 },
+};
 
+DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
+{
+    transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
+    dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption(),
+};
 
-    DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
-    {
-        transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-        dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption().ToArray(),
-    };
+byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
+sock.SendTo(send_buffer, endPoint);
 
-    return dhcpDiscoveryPacket.buildPacket();
-}
 ```
 
 ## NuGet
