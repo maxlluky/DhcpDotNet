@@ -1,4 +1,6 @@
-<img src="DhcpDotNet/logo.png" style="max-width:5%;">
+<a>
+    <img src="DhcpDotNet/logo.png" alt="DhcpDotNet" align="right" height="60" />
+</a>
 
 # DhcpDotNet
 DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities
