@@ -15,6 +15,8 @@ Once you know the basics, here's a few additional details for this project:
 2. If you have a code improvement or discovered an error, you can make your pull request.
 3. Pull requests will be build via the same system to ensure it compiles correctly and tests are passing
 
+Note: The update of the Nuget package is done by me
+
 ## Community
 While there's no dedicated community for the project currently,
 I will respond to issues here and can setup correspondance from there.
