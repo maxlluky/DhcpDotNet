@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace DhcpDotNet
 {
@@ -124,87 +125,105 @@ namespace DhcpDotNet
         /// <returns></returns>
         public byte[] buildDhcpOption()
         {
-            switch (optionId)
-            {
-                case (dhcpOptionIds)1:
-                    optionIdBytes = new byte[] { 0x35 };
-                    break;
-                case (dhcpOptionIds)2:
-                    optionIdBytes = new byte[] { 0x3d };
-                    break;
-                case (dhcpOptionIds)3:
-                    optionIdBytes = new byte[] { 0x32 };
-                    break;
-                case (dhcpOptionIds)4:
-                    optionIdBytes = new byte[] { 0x36 };
-                    break;
-                case (dhcpOptionIds)5:
-                    optionIdBytes = new byte[] { 0x33 };
-                    break;
-                case (dhcpOptionIds)6:
-                    optionIdBytes = new byte[] { 0x3a };
-                    break;
-                case (dhcpOptionIds)7:
-                    optionIdBytes = new byte[] { 0x3b };
-                    break;
-                case (dhcpOptionIds)8:
-                    optionIdBytes = new byte[] { 0x31 };
-                    break;
-                case (dhcpOptionIds)9:
-                    optionIdBytes = new byte[] { 0x03 };
-                    break;
-                case (dhcpOptionIds)10:
-                    optionIdBytes = new byte[] { 0x06 };
-                    break;
-                case (dhcpOptionIds)11:
-                    optionIdBytes = new byte[] { 0x0f };
-                    break;
-                case (dhcpOptionIds)12:
-                    optionIdBytes = new byte[] { 0x0c };
-                    break;
-                case (dhcpOptionIds)13:
-                    optionIdBytes = new byte[] { 0x51 };
-                    break;
-                case (dhcpOptionIds)14:
-                    optionIdBytes = new byte[] { 0x3c };
-                    break;
-                case (dhcpOptionIds)15:
-                    optionIdBytes = new byte[] { 0x37 };
-                    break;
-                case (dhcpOptionIds)16:
-                    optionIdBytes = new byte[] { 0x1c };
-                    break;
-                case (dhcpOptionIds)17:
-                    optionIdBytes = new byte[] { 0x2a };
-                    break;
-                case (dhcpOptionIds)18:
-                    optionIdBytes = new byte[] { 0x9e };
-                    break;
-            }
-
+            object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());            
+            optionIdBytes = new byte[] { Convert.ToByte(selected, null) };
+           
             return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
         }
     }
 
     public enum dhcpOptionIds : ushort
     {
-        DhcpMessageType = 1,
-        ClientIdentifier = 2,
-        RequestedIpAddress = 3,
-        DhcpServerIdentifier = 4,
-        IpAddressLeaseTime = 5,
-        RenewalTimeValue = 6,
-        RebindingTimeValue = 7,
-        SubnetMask = 8,
-        Router = 9,
-        DomainNameServer = 10,
-        DomainName = 11,
-        Hostname = 12,
-        ClientFullyQualifiedDomainName = 13,
-        VendorClassIdentifier = 14,
-        ParameterRequestList = 15,
-        BroadcastAddress = 16,
-        NetworkTimeProtocolServers = 17,
-        PCPServer = 18,
+        // BOOTP Vendor Information Extensions
+        Padding = 0,
+        Hostname = 1,
+        TimeOffset = 2,
+        Router = 3,
+        TimeServer = 4,
+        NameServer = 5,
+        DomainNameServer = 6,
+        LogServer = 7,
+        CookieServer = 8,
+        LprServer = 9,
+        ImpressServer = 10,
+        ResourceLocationServer = 11,
+        HostName = 12,
+        BootFileSize = 13,
+        MeritDumpFile = 14,
+        DomainName = 15,
+        SwapServer = 16,
+        RootPath = 17,
+        ExtensionsPath = 18,
+
+        // IP layer parameters per host
+        IpForwardingEnableDisable = 19,
+        NonLocalSourceRoutingEnableDisable = 20,
+        PolicyFilter = 21,
+        MaximumDatagramReassemblySize = 22,
+        DefaultIpTimeToLive = 23,
+        PathMtuAgingTimeout = 24,
+        PathMtuPlateauTable = 25,
+
+        // IP Layer Parameters per Interface
+        InterfaceMtu = 26,
+        AllSubnetsAreLocal = 27,
+        BroadcastAddress = 28,
+        PerformMaskDiscovery = 29,
+        MaskSupplier = 30,
+        PerformRouterDiscovery = 31,
+        RouterSolicitationAddress = 32,
+        StaticRoute = 33,
+
+        // Link layer parameters per interface
+        TrailerEncapsulationOption = 34,
+        ArpCacheTimeout = 35,
+        EthernetEncapsulation = 36,
+
+        // TCP parameters
+        TcpDefaultTTL = 37,
+        TcpKeepaliveInterval = 38,
+        TcpKeepaliveGarbage = 39,
+
+        // Application and service parameters
+        NetworkInformationServiceDomain = 40,
+        NetworkInformationServers = 41,
+        NetworkTimeProtocolServers = 42,
+        VendorSpecificInformation = 43,
+        NetBiosOverTcpIpNameServer = 44,
+        NetBiosOverTcpIpDatagramDistributionServer = 45,
+        NetBiosOverTcpIpNodeType = 46,
+        NetBIOSOverTcpIpScope = 47,
+        XWindowSystemFontServer = 48,
+        XWindowSystemDisplayManager = 49,
+        NetworkInformationServicePlusDomain = 64,
+        NetworkInformationServicePlusServers = 65,
+        MobileIPHomeAgent = 68,
+        SimpleMailTransferProtocolServer = 69,
+        PostOfficeProtocolServer = 70,
+        NetworkNewsTransferProtocolServer = 71,
+        DefaultWorldWideWebServer = 72,
+        DefaultFingerProtocolServer = 73,
+        DefaultInternetRelayChatServer = 74,
+        StreetTalkServer = 75,
+        StreetTalkDirectoryAssistanceServer = 76,
+
+        // DHCP extensions
+        RequestedIpAddress = 50,
+        IpAddressLeaseTime = 51,
+        OptionOverload = 52,
+        DhcpMessageType = 53,
+        ServerIdentifier = 54,
+        ParameterRequestList = 55,
+        Message = 56,
+        MaximumDhcpMessageSize = 57,
+        RenewalTimeValue = 58,
+        RebindingTimeValue = 59,
+        VendorClassIdentifier = 60,
+        ClientIdentifier = 61,
+        TftpServerName = 66,
+        BootfileName = 67,
+
+        // BOOTP Vendor Information Extensions
+        End = 255,
     }
 }
