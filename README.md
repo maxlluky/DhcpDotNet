@@ -69,3 +69,6 @@ PM> Install-Package DhcpDotNet -Version 1.0.7
 > dotnet add package DhcpDotNet --version 1.0.7
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
+
+## Author
+This developer and the copyright holder of this library is <a href="https://github.com/Marschall-dev">Marschall-dev</a>
