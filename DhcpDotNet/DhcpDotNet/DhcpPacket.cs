@@ -2,70 +2,126 @@
 
 namespace DhcpDotNet
 {
+    /// <summary>
+    /// Creates an empty predefined DHCP packet in the form of a byte array.
+    /// </summary>
     public class DhcpPacket
     {
-        //-- MessageType, HardwareType, Hardware-Address-Length
+        /// <summary>
+        /// Has MessageType, HardwareType, Hardware-Address-Length
+        /// </summary>
         public byte[] firstPart { get; set; } = new byte[3] { 0x01, 0x01, 0x06 };
 
-        //--hops : Anzahl der DHCP-Relay-Agents auf dem Datenpfad
+        /// <summary>
+        /// Number of DHCP relay agents on the data path
+        /// </summary>
         public byte[] hops { get; set; } = new byte[1] { 0x00 };
 
-        //--transactionID : ID der Verbindung zwischen Client und Server
+        /// <summary>
+        ///  ID of the connection between client and server
+        /// </summary>
         public byte[] transactionID { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
-        //--secs : Zeit in Sekunden seit dem Start des Clients
+        /// <summary>
+        /// Time in seconds since the client was started
+        /// </summary>
         public byte[] secs { get; set; } = new byte[2] { 0x0c, 0x00 };
 
-        //--BootpFlags : Z. Zt. wird nur das erste Bit verwendet (zeigt an, ob der Client noch eine gültige IP-Adresse hat), die restlichen Bits sind für spätere Protokollerweiterungen reserviert
+        /// <summary>
+        /// Currently, only the first bit is used (indicates if the client still has a valid IP address), the remaining bits are reserved for later protocol extensions
+        /// </summary>
         public byte[] bootpFlags { get; set; } = new byte[2] { 0x00, 0x00 };
 
-        //--clientIP : Client-IP-Adresse
+        /// <summary>
+        /// Client-IP-Adresse
+        /// </summary>
         public byte[] clientIP { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
-        //--yourIP : eigene IP-Adresse
+        /// <summary>
+        /// own IP-address
+        /// </summary>
         public byte[] yourIP { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
-        //--nextServerIP : Server-IP-Adresse
+        /// <summary>
+        /// Server-IP-Adresse
+        /// </summary>
         public byte[] nextServerIP { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
-        //--relayAgentIP : Relay-Agent-IP-Adresse
+        /// <summary>
+        /// Relay-Agent-IP-Adresse
+        /// </summary>
         public byte[] relayAgentIP { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
-        //--clientMac : Client-MAC-Adresse
+        /// <summary>
+        /// Client-MAC-Adresse
+        /// </summary>
         public byte[] clientMac { get; set; } = new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-        //--clientMacPadding : 
+        /// <summary>
+        /// clientMacPadding
+        /// </summary>
         public byte[] clientMacPadding { get; set; } = new byte[10] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-        //--serverHostname :  Name des DHCP-Servers, falls ein bestimmter gefordert wird (enthält C-String), Angabe optional
+        /// <summary>
+        /// Name of the DHCP server, if a specific one is required (contains C-string), specification optional
+        /// </summary>
         public byte[] serverHostname { get; set; } = new byte[64] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-        //--bootFilename :  Name einer Datei (z. B. System-Kernel), die vom Server per TFTP an den Client gesendet werden soll (enthält C-String), Angabe optional
+        /// <summary>
+        /// Name of a file (e.g. system kernel) to be sent from the server to the client via TFTP (contains C-string), specification optional
+        /// </summary>
         public byte[] bootFilename { get; set; } = new byte[128] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-        //--magicCookie : 
+        /// <summary>
+        /// Defines DHCP, instead of BOOTP
+        /// </summary>
         public byte[] magicCookie { get; set; } = new byte[4] { 0x63, 0x82, 0x53, 0x63 };
 
-        //--options : Add several DHCP options to this field
+        /// <summary>
+        /// DHCP parameters and options (described in RFC 2132) - The options can be up to 312 bytes long, so a packet up to 576 bytes long can occur. A larger maximum byte count can be 'negotiated' between server and client.
+        /// </summary>
         public byte[] dhcpOptions { get; set; } = new byte[] { };
 
-        //--end
+        /// <summary>
+        /// Defines the end of the DHCP payload
+        /// </summary>
         public byte[] end { get; set; } = new byte[1] { 0xff };
 
-
+        /// <summary>
+        /// Creates a byte array in the form of a DHCP payload, which can be sent via a UDP datagram. 
+        /// </summary>
+        /// /// <returns></returns>
         public byte[] buildPacket()
         {
             return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpOptions).Concat(end).ToArray();
         }
     }
 
+    /// <summary>
+    ///  Create a DHCP option, as listed in RFC 2132[13] and IANA registry.
+    /// </summary>
     public class DhcpOption
     {
+        /// <summary>
+        /// Define the DHCP options to be created by name
+        /// </summary>
         public dhcpOptionIds optionId { get; set; } = new dhcpOptionIds();
         private byte[] optionIdBytes = new byte[] { };
+
+        /// <summary>
+        /// Define the required length for the optionValue
+        /// </summary>
         public byte[] optionLength { get; set; } = new byte[] { };
+
+        /// <summary>
+        /// Define the value for the option e.g. subnet mask
+        /// </summary>
         public byte[] optionValue { get; set; } = new byte[] { };
 
+        /// <summary>
+        /// Create the DHCP option as byte array. Is then specified as an option in the DhcpPacket.
+        /// </summary>
+        /// <returns></returns>
         public byte[] buildDhcpOption()
         {
             switch (optionId)
