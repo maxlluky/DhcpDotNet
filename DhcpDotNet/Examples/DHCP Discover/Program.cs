@@ -28,7 +28,7 @@ namespace DHCP_Discover
         private static byte[] buildDhcpPayload()
         {
             // Create optional payload bytes that can be added to the main payload.
-            DhcpOption dhcpServerIdentifierOption = new DhcpOption()
+            DhcpOption dhcpMessageTypeOption = new DhcpOption()
             {
                 optionId = dhcpOptionIds.DhcpMessageType,
                 optionLength = new byte[] { 0x01 },
