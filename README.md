@@ -18,7 +18,7 @@ the following dhcp messages can be created:
 - DHCPINFORM
 ```
 
-The following tables list the available DHCP options, as listed in RFC 2132 and IANA registry:
+The following tables list the available DHCP options, as listed in <a href="https://tools.ietf.org/html/rfc2132">RFC 2132</a> and IANA registry:
 ```
 // BOOTP Vendor Information Extensions
 Padding
