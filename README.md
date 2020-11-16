@@ -118,7 +118,7 @@ End
 ```
 
 ## Examples
-See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet
+See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet.<br>
 A DHCPv4 server under C# will soon appear under the name DhcpSharp
 
 ## Usage
