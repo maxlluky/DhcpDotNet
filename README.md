@@ -119,6 +119,7 @@ End
 
 ## Examples
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet
+A DHCPv4 server under C# will soon appear under the name DhcpSharp
 
 ## Usage
 Example of a DHCP Discover package. The payload can be sent with a UdpClient or socket.
