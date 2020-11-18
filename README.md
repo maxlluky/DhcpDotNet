@@ -26,7 +26,7 @@ The following tables list the available DHCP options, as listed in <a href="http
 ```
 // BOOTP Vendor Information Extensions
 Padding
-Hostname
+Subnetmask
 TimeOffset
 Router
 TimeServer
@@ -149,12 +149,12 @@ sock.SendTo(send_buffer, endPoint);
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 1.0.7
+PM> Install-Package DhcpDotNet -Version 2.0.0
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 1.0.7
+> dotnet add package DhcpDotNet --version 2.0.0
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
