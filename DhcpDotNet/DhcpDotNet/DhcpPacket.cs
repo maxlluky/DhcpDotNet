@@ -157,71 +157,7 @@ namespace DhcpDotNet
 
             return false;
         }
-
-        public List<DhcpOptionRaw> extractDhcpOptions()
-        {
-            List<DhcpOptionRaw> dhcpOptionsList = new List<DhcpOptionRaw>();
-
-            int optionSize = 0;
-
-            while (optionSize <= 60)
-            {
-                //--NEW OPTIONPART
-                byte[] newOptionId = dhcpOptions.Skip(optionSize).Take(1).ToArray();
-                optionSize++; // = 1
-
-                byte[] newOptionLength = dhcpOptions.Skip(optionSize).Take(1).ToArray();
-                optionSize++; // = 2
-
-                byte[] newOptionValue = dhcpOptions.Skip(optionSize).Take(Convert.ToInt32(newOptionLength)).ToArray();
-
-                optionSize += Convert.ToByte(newOptionLength); // = ?
-
-                //--Create dhcpOption
-                DhcpOptionRaw tempOption = new DhcpOptionRaw
-                {
-                    optionId = newOptionId,
-                    optionLength = newOptionLength,
-                    optionValue = newOptionValue
-                };
-
-                dhcpOptionsList.Add(tempOption);
-            }                                      
-
-            return dhcpOptionsList;
-        }
-    }
-
-    /// <summary>
-    ///  Create a DHCP option, as listed in RFC 2132[13] and IANA registry without optionId-Enum.
-    /// </summary>
-    public class DhcpOptionRaw
-    {
-        /// <summary>
-        /// Define the DHCP options to be created by name
-        /// </summary>
-        public byte[] optionId { get; set; } = new byte[] { };
-        private byte[] optionIdBytes = new byte[] { };
-
-        /// <summary>
-        /// Define the required length for the optionValue
-        /// </summary>
-        public byte[] optionLength { get; set; } = new byte[] { };
-
-        /// <summary>
-        /// Define the value for the option e.g. subnet mask
-        /// </summary>
-        public byte[] optionValue { get; set; } = new byte[] { };
-
-        /// <summary>
-        /// Create the DHCP option as byte array. Is then specified as an option in the DhcpPacket.
-        /// </summary>
-        /// <returns></returns>
-        public byte[] buildDhcpOption()
-        {
-            return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
-        }
-    }
+    }  
 
     /// <summary>
     ///  Create a DHCP option, as listed in RFC 2132[13] and IANA registry with optionId-Enum 
