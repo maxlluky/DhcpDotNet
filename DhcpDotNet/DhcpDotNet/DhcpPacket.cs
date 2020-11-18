@@ -9,9 +9,19 @@ namespace DhcpDotNet
     public class DhcpPacket
     {
         /// <summary>
-        /// Has MessageType, HardwareType, Hardware-Address-Length
+        /// Information whether it is a request (request = 1) or a reply (reply = 2)
         /// </summary>
-        public byte[] firstPart { get; set; } = new byte[3] { 0x01, 0x01, 0x06 };
+        public byte[] messageType { get; set; } = new byte[1] { 0x01 };
+
+        /// <summary>
+        /// Network type (e.g. 1 = Ethernet, 6 = IEEE 802 networks or 7 = ARCNET)
+        /// </summary>
+        public byte[] hardwareType { get; set; } = new byte[1] { 0x01 };
+
+        /// <summary>
+        /// Length of the physical network address in bytes (e.g. 6 = MAC/Ethernet address)
+        /// </summary>
+        public byte[] hardwareAddressLength { get; set; } = new byte[1] { 0x06 };
 
         /// <summary>
         /// Number of DHCP relay agents on the data path
@@ -94,7 +104,55 @@ namespace DhcpDotNet
         /// /// <returns></returns>
         public byte[] buildPacket()
         {
-            return firstPart.Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpOptions).Concat(end).ToArray();
+            return messageType.Concat(hardwareType).Concat(hardwareAddressLength).Concat(hops).Concat(transactionID).Concat(secs).Concat(bootpFlags).Concat(clientIP).Concat(yourIP).Concat(nextServerIP).Concat(relayAgentIP).Concat(clientMac).Concat(clientMacPadding).Concat(serverHostname).Concat(bootFilename).Concat(magicCookie).Concat(dhcpOptions).Concat(end).ToArray();
+        }
+
+        /// <summary>
+        /// Parses a raw-DHCP payload. The return value indicates whether the process was successful. 
+        /// </summary>
+        /// <param name="pPayload">The entire Udp payload must be transferred</param>
+        /// <returns></returns>
+        public bool parsePacket(byte[] pPayload)
+        {
+            try
+            {
+                messageType = pPayload.Take(1).ToArray();
+
+                hardwareType = pPayload.Skip(1).Take(1).ToArray();
+
+                hardwareAddressLength = pPayload.Skip(2).Take(1).ToArray();
+
+                hops = pPayload.Skip(3).Take(1).ToArray();
+
+                transactionID = pPayload.Skip(4).Take(4).ToArray();
+
+                secs = pPayload.Skip(8).Take(2).ToArray();
+
+                bootpFlags = pPayload.Skip(10).Take(2).ToArray();
+
+                clientIP = pPayload.Skip(12).Take(4).ToArray();
+
+                yourIP = pPayload.Skip(16).Take(4).ToArray();
+
+                nextServerIP = pPayload.Skip(20).Take(4).ToArray();
+
+                relayAgentIP = pPayload.Skip(24).Take(4).ToArray();
+
+                clientMac = pPayload.Skip(28).Take(6).ToArray();
+
+                clientMacPadding = pPayload.Skip(34).Take(10).ToArray();
+
+                serverHostname = pPayload.Skip(44).Take(64).ToArray();
+
+                bootFilename = pPayload.Skip(108).Take(128).ToArray();
+
+                magicCookie = pPayload.Skip(236).Take(4).ToArray();
+
+                return true;
+            }
+            catch (Exception) { }
+
+            return false;
         }
     }
 
@@ -125,9 +183,9 @@ namespace DhcpDotNet
         /// <returns></returns>
         public byte[] buildDhcpOption()
         {
-            object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());            
+            object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());
             optionIdBytes = new byte[] { Convert.ToByte(selected, null) };
-           
+
             return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
         }
     }
@@ -136,7 +194,7 @@ namespace DhcpDotNet
     {
         // BOOTP Vendor Information Extensions
         Padding = 0,
-        Hostname = 1,
+        Subnetmask = 1,
         TimeOffset = 2,
         Router = 3,
         TimeServer = 4,
