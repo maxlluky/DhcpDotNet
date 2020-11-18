@@ -8,12 +8,13 @@
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Marschall-dev/DhcpDotNet</RepositoryUrl>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <PackageTags>DHCP, DHCP Packet, DHCP Server, DHCP Client, Dynamic Host Configuration Protocol</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageIcon>logo.png</PackageIcon>
     <Description>Fully managed, cross platform (Windows, Mac, Linux) .NET library for creating DHCP packets</Description>
     <PackageProjectUrl>https://github.com/Marschall-dev/DhcpDotNet</PackageProjectUrl>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
