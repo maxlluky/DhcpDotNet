@@ -35,7 +35,7 @@ namespace DhcpDotNet
         public byte[] transactionID { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
 
         /// <summary>
-        /// Time in seconds since the client was started
+        /// Time in seconds since the client was started. Default is 12secs
         /// </summary>
         public byte[] secs { get; set; } = new byte[2] { 0x0c, 0x00 };
 
@@ -95,7 +95,7 @@ namespace DhcpDotNet
         public byte[] dhcpOptions { get; set; } = new byte[] { };
 
         /// <summary>
-        /// Defines the end of the DHCP payload
+        /// Defines the end of the DHCP payload. Default: ff(hex), 255(dec)
         /// </summary>
         public byte[] end { get; set; } = new byte[1] { 0xff };
 
