@@ -8,7 +8,7 @@ DhcpDotNet allows the programming of a DHCP server, clients with full controller
 
 - Build DHCP Packets
 - Parse incoming DHCP Packets
-- Read parse Packets
+- Read parsed Packets
 
 ## Become a contributor
 If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:maxarttm@gmail.com">here</a>
