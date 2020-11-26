@@ -191,6 +191,16 @@ namespace DhcpDotNet
 
             return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
         }
+
+        public List<DhcpOption> parseDhcpOptions(byte[] pPayload)
+        {
+            List<DhcpOption> dhcpOptionList = new List<DhcpOption>();
+
+            
+
+            return dhcpOptionList;
+        }
+
     }
 
     public enum dhcpOptionIds : ushort
