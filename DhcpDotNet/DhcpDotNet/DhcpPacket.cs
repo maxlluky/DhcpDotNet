@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace DhcpDotNet
@@ -186,8 +187,11 @@ namespace DhcpDotNet
         /// <returns></returns>
         public byte[] buildDhcpOption()
         {
-            object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());
-            optionIdBytes = new byte[] { Convert.ToByte(selected, null) };
+            if (Enum.IsDefined(typeof(dhcpOptionIds), optionId))
+            {
+                object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());
+                optionIdBytes = new byte[] { Convert.ToByte(selected, null) };
+            }           
 
             return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
         }
@@ -196,7 +200,39 @@ namespace DhcpDotNet
         {
             List<DhcpOption> dhcpOptionList = new List<DhcpOption>();
 
-            
+            using (MemoryStream memoryStream = new MemoryStream(pPayload))
+            {
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
+                {
+                    bool endfound = false;
+
+                    while (!endfound)
+                    {
+                        byte[] dhcpOptionID = binaryReader.ReadBytes(1);
+                        byte[] dhcpOptionValueLength = new byte[] { };
+                        byte[] dhcpOptionValue = null;
+
+                        if (Convert.ToInt32(dhcpOptionID) != 255)
+                        {
+                            dhcpOptionValueLength = binaryReader.ReadBytes(1);
+                            dhcpOptionValue = binaryReader.ReadBytes(Convert.ToInt32(dhcpOptionValueLength));
+                        }
+                        else
+                        {
+                            endfound = true;
+                        }
+
+                        DhcpOption dhcpOption = new DhcpOption
+                        {
+                            optionIdBytes = dhcpOptionID,
+                            optionLength = dhcpOptionValueLength,
+                            optionValue = dhcpOptionValue,
+                        };
+
+                        dhcpOptionList.Add(dhcpOption);
+                    }                    
+                }
+            }
 
             return dhcpOptionList;
         }
