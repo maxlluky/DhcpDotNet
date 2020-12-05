@@ -4,9 +4,11 @@
 
 # DhcpDotNet
 DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities.
-DhcpDotNet allows the programming of a DHCP server, clients with full controller for C#. 
+DhcpDotNet allows the programming of a DHCP server or client with full controll. 
 
 - Build DHCP Packets
+- Sending DHCP Packets
+- Receiving DHCP Packets
 - Parse incoming DHCP Packets
 - Read parsed Packets
 
