@@ -135,7 +135,7 @@ IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
 DhcpOption dhcpMessageTypeOption = new DhcpOption()
 {
     optionId = dhcpOptionIds.DhcpMessageType,
-    optionLength = new byte[] { 0x01 },
+    optionLength = 0x01,
     optionValue = new byte[] { 0x01 },
 };
 
