@@ -3,13 +3,13 @@
 </a>
 
 # DhcpDotNet
-DHCP packet implemented with C#. Build DHCP-packages with nearly all possibilities.
-DhcpDotNet allows the programming of a DHCP server or client with full controll. 
+DHCPv4 packet implemented with C#. Build DHCPv4-packages with nearly all possibilities.
+DhcpDotNet allows the programming of a DHCPv4 server or client with full controll. 
 
-- Build DHCP Packets
-- Sending DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
-- Receiving DHCP Packets (see sending)
-- Parse incoming DHCP Packets
+- Build DHCPv4 Packets
+- Sending DHCPv4 Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
+- Receiving DHCPv4 Packets (see sending)
+- Parse incoming DHCPv4 Packets
 - Read parsed Packets
 
 ## Become a contributor
@@ -128,7 +128,7 @@ See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examp
 A DHCPv4 server under C# will soon appear under the name DhcpSharp
 
 ## Usage
-Example of a DHCP Discover package. The payload can be sent with a UdpClient or socket.
+Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket.
 ```csharp
 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
