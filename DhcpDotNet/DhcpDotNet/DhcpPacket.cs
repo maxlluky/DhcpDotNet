@@ -6,7 +6,7 @@ using System.Linq;
 namespace DhcpDotNet
 {
     /// <summary>
-    /// Creates an empty predefined DHCP packet in the form of a byte array. Please visit RFC 2131 for detaied information.
+    /// Creates an empty predefined DHCP packet in the form of a byte array. Please visit RFC 2131 for detaied information: https://tools.ietf.org/html/rfc2131
     /// </summary>
     public class DhcpPacket
     {
@@ -169,7 +169,7 @@ namespace DhcpDotNet
         /// Define the DHCP options to be created by name
         /// </summary>
         public dhcpOptionIds optionId { get; set; } = new dhcpOptionIds();
-        private byte[] optionIdBytes = new byte[] { };
+        private byte optionIdBytes = new byte();
 
         /// <summary>
         /// Define the required length for the optionValue
@@ -190,10 +190,11 @@ namespace DhcpDotNet
             if (Enum.IsDefined(typeof(dhcpOptionIds), optionId))
             {
                 object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());
-                optionIdBytes = new byte[] { Convert.ToByte(selected, null) };
-            }           
+                optionIdBytes = Convert.ToByte(selected, null);
+            }
 
-            return optionIdBytes.Concat(optionLength).Concat(optionValue).ToArray();
+            byte[] result = new byte[] { optionIdBytes };
+            return result.Concat(optionLength).Concat(optionValue).ToArray();
         }
 
         public List<DhcpOption> parseDhcpOptions(byte[] pPayload)
@@ -206,9 +207,9 @@ namespace DhcpDotNet
                 {
                     bool endfound = false;
 
-                    while (!endfound)
+                    do
                     {
-                        byte[] dhcpOptionID = binaryReader.ReadBytes(1);
+                        byte dhcpOptionID = binaryReader.ReadByte();
                         byte[] dhcpOptionValueLength = new byte[] { };
                         byte[] dhcpOptionValue = null;
 
@@ -230,7 +231,8 @@ namespace DhcpDotNet
                         };
 
                         dhcpOptionList.Add(dhcpOption);
-                    }                    
+                    }
+                    while (!endfound);
                 }
             }
 
