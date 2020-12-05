@@ -183,7 +183,7 @@
     "C:\\Users\\mluck\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "2.0.1",
+    "version": "2.0.2",
     "restore": {
       "projectUniqueName": "G:\\Desktop\\DhcpDotNet\\DhcpDotNet\\DhcpDotNet\\DhcpDotNet.csproj",
       "projectName": "DhcpDotNet",
