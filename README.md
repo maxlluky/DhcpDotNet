@@ -149,8 +149,8 @@ DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
 
 byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
 sock.SendTo(send_buffer, endPoint);
-
 ```
+Please take a look at the DhcpSharp-Project for detailed information.
 
 ## NuGet
 Package Manager
