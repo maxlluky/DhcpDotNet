@@ -7,8 +7,8 @@ DHCP packet implemented with C#. Build DHCP-packages with nearly all possibiliti
 DhcpDotNet allows the programming of a DHCP server or client with full controll. 
 
 - Build DHCP Packets
-- Sending DHCP Packets
-- Receiving DHCP Packets
+- Sending DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
+- Receiving DHCP Packets (see sending)
 - Parse incoming DHCP Packets
 - Read parsed Packets
 
@@ -155,12 +155,12 @@ sock.SendTo(send_buffer, endPoint);
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 2.0.0
+PM> Install-Package DhcpDotNet -Version 2.0.1
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 2.0.0
+> dotnet add package DhcpDotNet --version 2.0.1
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
