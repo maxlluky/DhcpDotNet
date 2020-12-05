@@ -164,5 +164,14 @@ PM> Install-Package DhcpDotNet -Version 2.0.1
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
+## Latest Version and Changelog
+Version: 2.0.1
+
+```
+- Added dhcpOption parsing support. DhcpDotNet is now able to parse incoming DhcpPackets and their DhcpOptions. You can read each DhcpOption cotained in a DhcpPacket. This allows you to read all information provided by the options above listed.
+- Renamed DhcpPacket-Bytes. Each byte or byte-array in a DhcpPacket is now named as in the RFC 2132.
+- Added the possibility to define DhcpOptions with an enmu or single byte. This offers more flexibility and simplicity at the same time.
+```
+
 ## Author
 This developer and the copyright holder of this library is <a href="https://github.com/Marschall-dev">Marschall-dev</a>
