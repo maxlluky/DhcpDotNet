@@ -155,19 +155,23 @@ Please take a look at the DhcpSharp-Project for detailed information.
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 2.0.1
+PM> Install-Package DhcpDotNet -Version 2.0.2
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 2.0.1
+> dotnet add package DhcpDotNet --version 2.0.2
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
 ## Latest Version and Changelog
-Version: 2.0.1
+Version: 2.0.2
 
 ```
+V 2.0.2
+- Renamed class and methods with "v4". Dhcp with IPv6 comming soon...
+
+V. 2.0.1
 - Added dhcpOption parsing support. DhcpDotNet is now able to parse incoming DhcpPackets and their DhcpOptions. You can read each DhcpOption cotained in a DhcpPacket. This allows you to read all information provided by the options above listed.
 - Renamed DhcpPacket-Bytes. Each byte or byte-array in a DhcpPacket is now named as in the RFC 2132.
 - Added the possibility to define DhcpOptions with an enmu or single byte. This offers more flexibility and simplicity at the same time.
