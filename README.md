@@ -3,20 +3,20 @@
 </a>
 
 # DhcpDotNet
-DHCPv4 packet implemented with C#. Build DHCPv4-packages with nearly all possibilities.
-DhcpDotNet allows the programming of a DHCPv4 server or client with full controll. 
+DHCPv4 and DHCPv6 packet implemented with C#. Build DHCP-packages with nearly all possibilities.
+DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full controll. 
 
-- Build DHCPv4 Packets
-- Sending DHCPv4 Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
-- Receiving DHCPv4 Packets (see sending)
-- Parse incoming DHCPv4 Packets
+- Build DHCP Packets
+- Sending DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
+- Receiving DHCP Packets (see sending)
+- Parse incoming DHCP Packets
 - Read parsed Packets
 
 ## Become a contributor
 If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:maxarttm@gmail.com">here</a>
  
 ## Packet interpretation
-the following dhcp messages can be created:
+the following DHCPv4 messages can be created:
 ```
 - DHCPDISCOVER
 - DHCPOFFER
@@ -28,7 +28,7 @@ the following dhcp messages can be created:
 - DHCPINFORM
 ```
 
-The following tables list the available DHCP options, as listed in <a href="https://tools.ietf.org/html/rfc2132">RFC 2132</a> and IANA registry:
+The following tables list the available DHCPv4 options, as listed in <a href="https://tools.ietf.org/html/rfc2132">RFC 2132</a> and IANA registry:
 ```
 // BOOTP Vendor Information Extensions
 Padding
