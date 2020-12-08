@@ -4,12 +4,12 @@
 
 # DhcpDotNet
 DHCPv4 and DHCPv6 packet implemented with C#. Build DHCP-packages with nearly all possibilities.
-DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full controll. 
+DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full controll. DhcpDotNet was created according to the specifications of <a href="https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml">IANA</a> and RFC 2131, 4388, 1531, 8415 and 3315.
 
 - Build DHCP Packets
-- Sending DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
-- Receiving DHCP Packets (see sending)
-- Parse incoming DHCP Packets
+- Send DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
+- Receive DHCP Packets (see sending)
+- Parse DHCP Packets
 - Read parsed Packets
 
 ## Become a contributor
