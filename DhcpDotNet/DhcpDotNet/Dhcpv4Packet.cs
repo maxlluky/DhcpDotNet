@@ -13,77 +13,77 @@ namespace DhcpDotNet
         /// <summary>
         /// Message op code / message type. 1 = BOOTREQUEST, 2 = BOOTREPLY
         /// </summary>
-        public byte[] op { get; set; } = new byte[1] { 0x01 };
+        public byte op { get; set; } = new byte();
 
         /// <summary>
         /// Hardware address type, see ARP section in "Assigned Numbers" RFC; e.g., '1' = 10mb ethernet.
         /// </summary>
-        public byte[] htype { get; set; } = new byte[1] { 0x01 };
+        public byte htype { get; set; } = new byte();
 
         /// <summary>
         /// Hardware address length (e.g.  '6' for 10mb ethernet).
         /// </summary>
-        public byte[] hlen { get; set; } = new byte[1] { 0x06 };
+        public byte hlen { get; set; } = new byte();
 
         /// <summary>
         /// Client sets to zero, optionally used by relay agents when booting via a relay agent.
         /// </summary>
-        public byte[] hops { get; set; } = new byte[1] { 0x00 };
+        public byte hops { get; set; } = new byte();
 
         /// <summary>
         ///  Transaction ID, a random number chosen by the client, used by the client and server to associate messages and responses between a client and a server.
         /// </summary>
-        public byte[] xid { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+        public byte[] xid { get; set; } = new byte[4];
 
         /// <summary>
         /// Filled in by client, seconds elapsed since client began address acquisition or renewal process.
         /// </summary>
-        public byte[] secs { get; set; } = new byte[2] { 0x00, 0x00 };
+        public byte[] secs { get; set; } = new byte[2];
 
         /// <summary>
         /// Flags (see figure 2).
         /// </summary>
-        public byte[] flags { get; set; } = new byte[2] { 0x00, 0x00 };
+        public byte[] flags { get; set; } = new byte[2];
 
         /// <summary>
         /// Client IP address; only filled in if client is in BOUND, RENEW or REBINDING state and can respond to ARP requests.
         /// </summary>
-        public byte[] ciaddr { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+        public byte[] ciaddr { get; set; } = new byte[4];
 
         /// <summary>
         /// 'your' (client) IP address.
         /// </summary>
-        public byte[] yiaddr { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+        public byte[] yiaddr { get; set; } = new byte[4];
 
         /// <summary>
         /// IP address of next server to use in bootstrap; returned in DHCPOFFER, DHCPACK by server.
         /// </summary>
-        public byte[] siaddr { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+        public byte[] siaddr { get; set; } = new byte[4];
 
         /// <summary>
         /// Relay agent IP address, used in booting via a relay agent.
         /// </summary>
-        public byte[] giaddr { get; set; } = new byte[4] { 0x00, 0x00, 0x00, 0x00 };
+        public byte[] giaddr { get; set; } = new byte[4];
 
         /// <summary>
         /// Client hardware address.
         /// </summary>
-        public byte[] chaddr { get; set; } = new byte[6] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        public byte[] chaddr { get; set; } = new byte[6];
 
         /// <summary>
         /// If your chaddr is not 6 bytes long use this to match the chaddress-size of 16 bytes.
         /// </summary>
-        public byte[] chaddrPadding { get; set; } = new byte[10] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        public byte[] chaddrPadding { get; set; } = new byte[10];
 
         /// <summary>
         /// Optional server host name, null terminated string.
         /// </summary>
-        public byte[] sname { get; set; } = new byte[64] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        public byte[] sname { get; set; } = new byte[64];
 
         /// <summary>
         /// Boot file name, null terminated string; "generic" name or null in DHCPDISCOVER, fully qualified directory-path name in DHCPOFFER.
         /// </summary>
-        public byte[] file { get; set; } = new byte[128] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+        public byte[] file { get; set; } = new byte[128];
 
         /// <summary>
         /// Defines DHCP, instead of BOOTP
@@ -106,7 +106,33 @@ namespace DhcpDotNet
         /// /// <returns></returns>
         public byte[] buildPacket()
         {
-            return op.Concat(htype).Concat(hlen).Concat(hops).Concat(xid).Concat(secs).Concat(flags).Concat(ciaddr).Concat(yiaddr).Concat(siaddr).Concat(giaddr).Concat(chaddr).Concat(chaddrPadding).Concat(sname).Concat(file).Concat(magicCookie).Concat(dhcpOptions).Concat(end).ToArray();
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
+                {
+                    binaryWriter.Write(op);
+                    binaryWriter.Write(htype);
+                    binaryWriter.Write(hlen);
+                    binaryWriter.Write(hops);
+                    binaryWriter.Write(xid);
+                    binaryWriter.Write(secs);
+                    binaryWriter.Write(flags);
+                    binaryWriter.Write(ciaddr);
+                    binaryWriter.Write(yiaddr);
+                    binaryWriter.Write(siaddr);
+                    binaryWriter.Write(giaddr);
+                    binaryWriter.Write(chaddr);
+                    binaryWriter.Write(chaddrPadding);
+                    binaryWriter.Write(sname);
+                    binaryWriter.Write(file);
+                    binaryWriter.Write(magicCookie);
+                    binaryWriter.Write(dhcpOptions);
+                    binaryWriter.Write(end);
+                }
+                memoryStream.Flush();
+
+                return memoryStream.GetBuffer();
+            }
         }
 
         /// <summary>
@@ -118,44 +144,32 @@ namespace DhcpDotNet
         {
             try
             {
-                op = pPayload.Take(1).ToArray();
-
-                htype = pPayload.Skip(1).Take(1).ToArray();
-
-                hlen = pPayload.Skip(2).Take(1).ToArray();
-
-                hops = pPayload.Skip(3).Take(1).ToArray();
-
-                xid = pPayload.Skip(4).Take(4).ToArray();
-
-                secs = pPayload.Skip(8).Take(2).ToArray();
-
-                flags = pPayload.Skip(10).Take(2).ToArray();
-
-                ciaddr = pPayload.Skip(12).Take(4).ToArray();
-
-                yiaddr = pPayload.Skip(16).Take(4).ToArray();
-
-                siaddr = pPayload.Skip(20).Take(4).ToArray();
-
-                giaddr = pPayload.Skip(24).Take(4).ToArray();
-
-                chaddr = pPayload.Skip(28).Take(6).ToArray();
-
-                chaddrPadding = pPayload.Skip(34).Take(10).ToArray();
-
-                sname = pPayload.Skip(44).Take(64).ToArray();
-
-                file = pPayload.Skip(108).Take(128).ToArray();
-
-                magicCookie = pPayload.Skip(236).Take(4).ToArray();
-
-                dhcpOptions = pPayload.Skip(240).ToArray();
-
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (BinaryReader binaryReader = new BinaryReader(memoryStream))
+                    {
+                        op = binaryReader.ReadByte();
+                        htype = binaryReader.ReadByte();
+                        hlen = binaryReader.ReadByte();
+                        hops = binaryReader.ReadByte();
+                        xid = binaryReader.ReadBytes(4);
+                        secs = binaryReader.ReadBytes(2);
+                        flags = binaryReader.ReadBytes(2);
+                        ciaddr = binaryReader.ReadBytes(4);
+                        yiaddr = binaryReader.ReadBytes(4);
+                        siaddr = binaryReader.ReadBytes(4);
+                        giaddr = binaryReader.ReadBytes(4);
+                        chaddr = binaryReader.ReadBytes(Convert.ToInt32(hlen));
+                        chaddrPadding = binaryReader.ReadBytes(16 - chaddr.Length);
+                        sname = binaryReader.ReadBytes(64);
+                        file = binaryReader.ReadBytes(128);
+                        magicCookie = binaryReader.ReadBytes(4);
+                        dhcpOptions = binaryReader.ReadBytes(pPayload.Length - Convert.ToInt32(binaryReader.BaseStream.Position));
+                    }
+                }
                 return true;
             }
             catch (Exception) { }
-
             return false;
         }
     }

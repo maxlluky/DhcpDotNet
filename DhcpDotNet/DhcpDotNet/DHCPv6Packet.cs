@@ -58,15 +58,13 @@ namespace DhcpDotNet
                     {
                         msgtype = binaryReader.ReadByte();
                         transactionid = binaryReader.ReadBytes(3);
-                        options = binaryReader.ReadBytes(int.MaxValue);
+                        options = binaryReader.ReadBytes(pPayload.Length - 4);
                     }
                 }
                 return true;
             }
-            catch (Exception)
-            {
-                return false;
-            }
+            catch (Exception) { }
+            return false;
         }
     }
 
