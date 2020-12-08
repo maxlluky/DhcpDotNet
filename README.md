@@ -155,12 +155,12 @@ Please take a look at the DhcpSharp-Project for detailed information.
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 2.0.2
+PM> Install-Package DhcpDotNet -Version 2.0.3
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 2.0.2
+> dotnet add package DhcpDotNet --version 2.0.3
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
