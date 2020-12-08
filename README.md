@@ -168,6 +168,9 @@ PM> Install-Package DhcpDotNet -Version 2.0.3
 Version: 2.0.2
 
 ```
+V 2.0.3
+- Full support for DHCPv6. Fixed several performance down grades. Switch from linq to Binary reader/writer.
+
 V 2.0.2
 - Renamed class and methods with "v4". Dhcp with IPv6 comming soon...
 
