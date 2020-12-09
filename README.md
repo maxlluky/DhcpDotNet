@@ -14,17 +14,12 @@ DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full 
 
 ## Become a contributor
 If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:maxarttm@gmail.com">here</a>
- 
-## Packet interpretation
-```
--
-```
 
 ## Examples
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet.<br>
 A DHCPv4 server under C# will soon appear under the name DhcpSharp.
 
-## Usage
+## Usage Example
 Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket. (or using Sharppcap or Pcap.Net)
 ```csharp
 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
