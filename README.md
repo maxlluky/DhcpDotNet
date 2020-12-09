@@ -25,7 +25,7 @@ See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examp
 A DHCPv4 server under C# will soon appear under the name DhcpSharp.
 
 ## Usage
-Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket.
+Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket. (or using Sharppcap or Pcap.Net)
 ```csharp
 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
