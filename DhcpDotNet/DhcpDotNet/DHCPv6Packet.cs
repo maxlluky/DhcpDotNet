@@ -52,7 +52,7 @@ namespace DhcpDotNet
         {
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream())
+                using (MemoryStream memoryStream = new MemoryStream(pPayload))
                 {
                     using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                     {

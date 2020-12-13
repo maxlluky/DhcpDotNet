@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -144,7 +145,7 @@ namespace DhcpDotNet
         {
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream())
+                using (MemoryStream memoryStream = new MemoryStream(pPayload))
                 {
                     using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                     {
@@ -160,7 +161,7 @@ namespace DhcpDotNet
                         siaddr = binaryReader.ReadBytes(4);
                         giaddr = binaryReader.ReadBytes(4);
                         chaddr = binaryReader.ReadBytes(Convert.ToInt32(hlen));
-                        chaddrPadding = binaryReader.ReadBytes(16 - chaddr.Length);
+                        chaddrPadding = binaryReader.ReadBytes(Convert.ToInt32(16 - chaddr.Length));
                         sname = binaryReader.ReadBytes(64);
                         file = binaryReader.ReadBytes(128);
                         magicCookie = binaryReader.ReadBytes(4);
@@ -169,7 +170,10 @@ namespace DhcpDotNet
                 }
                 return true;
             }
-            catch (Exception) { }
+            catch (Exception eX) 
+            {
+                Debug.WriteLine("DhcpDotNet-Exception: " + eX.Message);
+            }
             return false;
         }
     }
