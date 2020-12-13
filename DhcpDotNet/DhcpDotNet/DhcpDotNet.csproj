@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Authors>Marschall TM</Authors>
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/Marschall-dev/DhcpDotNet</RepositoryUrl>
-    <Version>2.0.4</Version>
+    <Version>2.0.5</Version>
     <PackageTags>DHCP, DHCP Packet, DHCP Server, DHCP Client, Dynamic Host Configuration Protocol</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageIcon>logo.png</PackageIcon>
