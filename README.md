@@ -26,14 +26,14 @@ Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolT
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
 IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
 
-DhcpOption dhcpMessageTypeOption = new DhcpOption()
+DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option()
 {
     optionId = dhcpOptionIds.DhcpMessageType,
     optionLength = 0x01,
     optionValue = new byte[] { 0x01 },
 };
 
-DhcpPacket dhcpDiscoveryPacket = new DhcpPacket()
+DHCPv4Packet dhcpDiscoveryPacket = new DHCPv4Packet()
 {
     transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
     dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption(),
@@ -47,19 +47,22 @@ Please take a look at the DhcpSharp-Project for detailed information.
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 2.0.3
+PM> Install-Package DhcpDotNet -Version 2.0.4
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 2.0.3
+> dotnet add package DhcpDotNet --version 2.0.4
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
 ## Latest Version and Changelog
-Version: 2.0.2
+Version: 2.0.4
 
 ```
+V 2.0.4
+- Fixed missing code in parsePacket-Method
+
 V 2.0.3
 - Full support for DHCPv6. Fixed several performance down grades. Switch from linq to Binary reader/writer.
 
