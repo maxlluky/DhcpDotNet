@@ -26,17 +26,32 @@ Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolT
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
 IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
 
-DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option()
+DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
 {
-    optionId = dhcpOptionIds.DhcpMessageType,
+    optionId = DHCPv4OptionIds.DhcpMessageType,
     optionLength = 0x01,
-    optionValue = new byte[] { 0x01 },
+    optionValue = new byte[] { 0x02 },
 };
 
-DHCPv4Packet dhcpDiscoveryPacket = new DHCPv4Packet()
+DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
 {
-    transactionID = new byte[] { 0x00, 0x00, 0x00, 0x00 },
-    dhcpOptions = dhcpServerIdentifierOption.buildDhcpOption(),
+    optionId = DHCPv4OptionIds.ServerIdentifier,
+    optionLength = 0x04,
+    optionValue = IPAddress.Parse("").GetAddressBytes(),
+};
+
+DHCPv4Packet dhcpPacket = new DHCPv4Packet
+{
+    op = 0x02,
+    htype = 0x01,
+    hlen = 0x06,
+    xid = new byte[] {0x00, 0x01, 0x02, 0x03 },
+    secs = 0x00,
+    ciaddr = IPAddress.Parse("").GetAddressBytes(),
+    yiaddr = IPAddress.Parse("").GetAddressBytes(),
+    siaddr = IPAddress.Parse("").GetAddressBytes(),
+    chaddr = PhysicalAddress.Parse("").GetAddressBytes(),
+    dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
 };
 
 byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
@@ -47,19 +62,22 @@ Please take a look at the DhcpSharp-Project for detailed information.
 ## NuGet
 Package Manager
 ```
-PM> Install-Package DhcpDotNet -Version 2.0.4
+PM> Install-Package DhcpDotNet -Version 2.0.5
 ```
 
 .NET CLI
 ```
-> dotnet add package DhcpDotNet --version 2.0.4
+> dotnet add package DhcpDotNet --version 2.0.5
 ```
 <a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
 
 ## Latest Version and Changelog
-Version: 2.0.4
+Version: 2.0.5
 
 ```
+V 2.0.5
+- Changed NuGet licence
+
 V 2.0.4
 - Fixed missing code in parsePacket-Method
 
