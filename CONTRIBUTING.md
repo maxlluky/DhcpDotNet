@@ -6,7 +6,7 @@ Following these guidelines makes it easier for everyone to suggest changes, crea
 Please use the [Issues](https://github.com/Marschall-dev/DhcpDotNet/issues) section of GitHub to request changes or report issues.
 
 When the issue is used to create a new branch, the naming convention is:
-[branch naming convention](https://deepsource.io/images/blog/git-branch-naming-conventions/branch-naming-example.png)
+![branch naming convention](https://deepsource.io/images/blog/git-branch-naming-conventions/branch-naming-example.png)
 
 
 ## Pull Requests
