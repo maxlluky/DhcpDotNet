@@ -9,7 +9,7 @@ namespace DhcpDotNet
     /// <summary>
     /// Creates an empty predefined DHCPv4 packet in the form of a byte array. Please visit RFC 2131 for detaied information: https://tools.ietf.org/html/rfc2131
     /// </summary>
-    public class DHCPv4Packet
+    public class Dhcpv4Packet
     {
         /// <summary>
         /// Message op code / message type. 1 = BOOTREQUEST, 2 = BOOTREPLY
@@ -181,12 +181,12 @@ namespace DhcpDotNet
     /// <summary>
     ///  Create a DHCP option, as listed in RFC 2132[13] and IANA registry with optionId-Enum
     /// </summary>
-    public class DHCPv4Option
+    public class Dhcpv4Option
     {
         /// <summary>
         /// Define the DHCPv4 options to be created by name
         /// </summary>
-        public DHCPv4OptionIds optionId { get; set; } = new DHCPv4OptionIds();
+        public Dhcpv4OptionIds optionId { get; set; } = new Dhcpv4OptionIds();
 
         /// <summary>
         /// Represents the optionId (enum) in bytes. This field is not required if you set optionId with enum.
@@ -209,7 +209,7 @@ namespace DhcpDotNet
         /// <returns></returns>
         public byte[] buildDhcpOption()
         {
-            if (Enum.IsDefined(typeof(DHCPv4OptionIds), optionId))
+            if (Enum.IsDefined(typeof(Dhcpv4OptionIds), optionId))
             {
                 object selected = Convert.ChangeType(optionId, optionId.GetTypeCode());
                 optionIdBytes = Convert.ToByte(selected, null);
@@ -219,9 +219,9 @@ namespace DhcpDotNet
             return result.Concat(optionValue).ToArray();
         }
 
-        public List<DHCPv4Option> parseDhcpOptions(byte[] pPayload)
+        public List<Dhcpv4Option> parseDhcpOptions(byte[] pPayload)
         {
-            List<DHCPv4Option> dhcpOptionList = new List<DHCPv4Option>();
+            List<Dhcpv4Option> dhcpOptionList = new List<Dhcpv4Option>();
 
             using (MemoryStream memoryStream = new MemoryStream(pPayload))
             {
@@ -240,7 +240,7 @@ namespace DhcpDotNet
                             dhcpOptionValueLength = binaryReader.ReadByte();
                             dhcpOptionValue = binaryReader.ReadBytes(Convert.ToInt32(dhcpOptionValueLength));
 
-                            DHCPv4Option dhcpOption = new DHCPv4Option
+                            Dhcpv4Option dhcpOption = new Dhcpv4Option
                             {
                                 optionIdBytes = dhcpOptionID,
                                 optionLength = dhcpOptionValueLength,
@@ -262,7 +262,7 @@ namespace DhcpDotNet
         }
     }
 
-    public enum DHCPv4OptionIds : ushort
+    public enum Dhcpv4OptionIds : ushort
     {
         // BOOTP Vendor Information Extensions
         Padding = 0,

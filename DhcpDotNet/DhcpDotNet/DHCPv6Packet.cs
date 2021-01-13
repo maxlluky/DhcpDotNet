@@ -6,7 +6,7 @@ namespace DhcpDotNet
     /// <summary>
     /// Creates an empty predefined DHCPv6 packet (Advertise) in the form of a byte array. Please visit RFC 8415 for detaied information: https://tools.ietf.org/html/rfc8415
     /// </summary>
-    class DHCPv6Packet
+    class Dhcpv6Packet
     {
         /// <summary>
         /// Identifies the DHCP message type; the available message types are listed in Section 7.3 (RFC 8145). A 1-octet field.
@@ -71,12 +71,12 @@ namespace DhcpDotNet
     /// <summary>
     /// Create a DHCPv6 option, as listed in RFC 8415[24] and IANA registry with optionId-Enum 
     /// </summary>
-    class DHCPv6Option
+    class Dhcpv6Option
     {
         /// <summary>
         /// Define the DHCPv6 options to be created by name
         /// </summary>
-        public DHCPv6OptionIds optionId { get; set; } = new DHCPv6OptionIds();
+        public Dhcpv6OptionIds optionId { get; set; } = new Dhcpv6OptionIds();
 
         /// <summary>
         /// Represents the optionId (enum) in bytes. This field is not required if you set optionId with enum.
@@ -99,7 +99,7 @@ namespace DhcpDotNet
         /// <returns></returns>
         public byte[] buildDhcpOption()
         {
-            if (Enum.IsDefined(typeof(DHCPv6OptionIds), optionId))
+            if (Enum.IsDefined(typeof(Dhcpv6OptionIds), optionId))
             {
                 optionIdBytes = BitConverter.GetBytes((int)optionId);
             }
@@ -119,7 +119,7 @@ namespace DhcpDotNet
         }
     }
 
-    public enum DHCPv6OptionIds : ushort
+    public enum Dhcpv6OptionIds : ushort
     {
         CLIENTID = 1,
         SERVERID = 2,
