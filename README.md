@@ -2,7 +2,7 @@
     <img src="DhcpDotNet/logo.png" alt="DhcpDotNet" align="right" height="60" />
 </a>
 
-<h1>Please use the NuGet NetDotNet</h1>
+<h1>Please use NetDotNet over DhcpDotNet</h1>
 
 # DhcpDotNet
 DHCPv4 and DHCPv6 packet implemented with C#. Build DHCP-packages with nearly all possibilities.
