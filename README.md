@@ -103,4 +103,4 @@ Insofar as the content on this software was not created by the operator, the cop
 Source: [eRecht24.de](https://www.e-recht24.de/)
 
 ## Author
-This developer and the copyright holder of this library is <a href="https://github.com/Marschall-dev">Marschall-dev</a>
+This developer and the copyright holder of this library is <a href="https://github.com/maxlluky">MaxlLuky</a>
