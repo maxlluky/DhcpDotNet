@@ -7,8 +7,8 @@ DHCPv4 and DHCPv6 packet implemented with C#. Build DHCP-packages with nearly al
 DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full controll. DhcpDotNet was created according to the specifications of <a href="https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml">IANA</a> and RFC 2131, 4388, 1531, 8415 and 3315.
 
 - Build DHCP Packets
-- Send DHCP Packets (via UdpClient, Socket (advanced: sharppcap or Pcap.Net)
-- Receive DHCP Packets (see sending)
+- Send DHCP Packets (via UdpClient or Socket (advanced: sharppcap or Pcap.Net)
+- Receive DHCP Packets
 - Parse DHCP Packets
 - Read parsed Packets
 
@@ -17,10 +17,10 @@ If you want to help improve the project, you can read <a href="CONTRIBUTING.md">
 
 ## Example Projects
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet.<br>
-A DHCPv4 server under C# will soon appear under the name DhcpSharp.
-
+As an example project you can look at [DhcpSharp](https://github.com/maxlluky/DhcpSharp). DhcpSharp is a very basic DHCPv4 server programmed with DhcpDotNet.
+    
 ## Usage Example
-Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket. (or using Sharppcap or Pcap.Net)
+Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket. (or using SharpPcap or Pcap.Net)
 ```csharp
 Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
@@ -57,7 +57,6 @@ DHCPv4Packet dhcpPacket = new DHCPv4Packet
 byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
 sock.SendTo(send_buffer, endPoint);
 ```
-Please take a look at the DhcpSharp-Project for detailed information.
 
 ## NuGet
 Package Manager
