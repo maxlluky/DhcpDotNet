@@ -13,7 +13,7 @@ DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full 
 - Read parsed Packets
 
 ## Become a contributor
-If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:maxarttm@gmail.com">here</a>
+If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:mluckert@outlook.de">here</a>
 
 ## Example Projects
 See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet.<br>
