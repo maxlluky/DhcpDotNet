@@ -3,101 +3,178 @@
 </a>
 
 # DhcpDotNet
-DHCPv4 and DHCPv6 packet implemented with C#. Build DHCP-packages with nearly all possibilities.
-DhcpDotNet allows the programming of a DHCPv4/DHCPv6 server or client with full controll. DhcpDotNet was created according to the specifications of <a href="https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml">IANA</a> and RFC 2131, 4388, 1531, 8415 and 3315.
 
-- Build DHCP Packets
-- Send DHCP Packets (via UdpClient or Socket (advanced: sharppcap or Pcap.Net)
-- Receive DHCP Packets
-- Parse DHCP Packets
-- Read parsed Packets
+Fully managed, cross-platform (Windows, macOS, **Linux**) .NET library for building, parsing,
+sending and receiving **DHCPv4** and **DHCPv6** packets — plus a high-level asynchronous DHCPv4
+server host so you can stand up a working DHCP server in a few lines of code.
 
-## Become a contributor
-If you want to help improve the project, you can read <a href="CONTRIBUTING.md">this<a/>. If you would like to be part of the project, please contact us <a href="mailto:mluckert@outlook.de">here</a>
+DhcpDotNet follows the [IANA](https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml)
+assignments and RFC 2131 / 2132 (DHCPv4) and RFC 8415 (DHCPv6).
 
-## Example Projects
-See the <a href="/DhcpDotNet/Examples/">Examples</a> folder for a range of examples using DhcpDotNet.<br>
-As an example project you can look at [DhcpSharp](https://github.com/maxlluky/DhcpSharp). DhcpSharp is a very basic DHCPv4 server programmed with DhcpDotNet.
-    
-## Usage Example
-Example of a DHCPv4 Discover package. The payload can be sent with a UdpClient or socket. (or using SharpPcap or Pcap.Net)
+- **Build** DHCPv4 / DHCPv6 packets with full control over every field and option
+- **Parse** received packets and read every option
+- **Send / receive** via the built-in `UdpClient`/`Socket` transport
+- **Serve** leases with the batteries-included `Dhcpv4Server`, `Dhcpv4LeasePool` and `Dhcpv4Reply` helpers
+
+## Requirements
+
+- The library targets **.NET Standard 2.0** and **.NET 8.0**, so it runs on .NET 8+, .NET Framework 4.6.1+,
+  and Mono/Xamarin.
+- To build from source you need the [.NET SDK 8.0](https://dotnet.microsoft.com/download) or newer.
+
+## Project layout
+
+```
+DhcpDotNet/
+├─ DhcpDotNet/               # the library (Dhcpv4/Dhcpv6 packets, server, lease pool)
+├─ samples/DhcpServerSample/ # a runnable DHCPv4 server you can start on Linux
+└─ tests/DhcpDotNet.Tests/   # xUnit test suite
+```
+
+## Build & test
+
+```bash
+cd DhcpDotNet          # the folder containing DhcpDotNet.sln
+dotnet build
+dotnet test
+```
+
+## Quick start — build a DHCPv4 packet
+
 ```csharp
-Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-IPAddress serverAddr = IPAddress.Parse("192.168.2.1");
-IPEndPoint endPoint = new IPEndPoint(serverAddr, 67);
+using System.Net;
+using System.Net.NetworkInformation;
+using DhcpDotNet;
 
-DHCPv4Option dhcpMessageTypeOption = new DHCPv4Option
+// A DHCP option (here: message type = DISCOVER).
+Dhcpv4Option messageType = new Dhcpv4Option
 {
-    optionId = DHCPv4OptionIds.DhcpMessageType,
-    optionLength = 0x01,
-    optionValue = new byte[] { 0x02 },
+    optionId = Dhcpv4OptionIds.DhcpMessageType,
+    optionValue = new byte[] { (byte)Dhcpv4MessageType.Discover },
+};
+// optionLength is derived from the value automatically.
+
+Dhcpv4Packet discover = new Dhcpv4Packet
+{
+    op = 0x01,                                   // BOOTREQUEST
+    xid = new byte[] { 0x00, 0x01, 0x02, 0x03 },
+    chaddr = PhysicalAddress.Parse("00-11-22-33-44-55").GetAddressBytes(),
+    dhcpOptions = messageType.buildDhcpOption(),
 };
 
-DHCPv4Option dhcpServerIdentifierOption = new DHCPv4Option
+byte[] payload = discover.buildPacket();          // ready to send over UDP
+```
+
+Parsing works the same way in reverse:
+
+```csharp
+Dhcpv4Packet packet = new Dhcpv4Packet();
+if (packet.parsePacket(payload))
 {
-    optionId = DHCPv4OptionIds.ServerIdentifier,
-    optionLength = 0x04,
-    optionValue = IPAddress.Parse("").GetAddressBytes(),
+    Dhcpv4MessageType? type = packet.getMessageType();
+    foreach (Dhcpv4Option option in packet.getOptions())
+    {
+        // read each option
+    }
+}
+```
+
+## Quick start — run a DHCPv4 server
+
+```csharp
+using System.Net;
+using DhcpDotNet;
+
+var config = new Dhcpv4ServerConfiguration
+{
+    ServerIdentifier = IPAddress.Parse("192.168.50.1"),
+    SubnetMask = IPAddress.Parse("255.255.255.0"),
+    Router = IPAddress.Parse("192.168.50.1"),
+    LeaseTime = TimeSpan.FromHours(12),
+};
+config.DnsServers.Add(IPAddress.Parse("1.1.1.1"));
+
+var pool = new Dhcpv4LeasePool(
+    IPAddress.Parse("192.168.50.100"),
+    IPAddress.Parse("192.168.50.200"),
+    config.LeaseTime);
+
+using var server = new Dhcpv4Server();
+server.PacketReceived += (_, e) =>
+{
+    switch (e.MessageType)
+    {
+        case Dhcpv4MessageType.Discover:
+            var offer = pool.Acquire(e.Packet.chaddr);
+            if (offer != null) e.Reply = Dhcpv4Reply.CreateOffer(e.Packet, offer, config);
+            break;
+        case Dhcpv4MessageType.Request:
+            var lease = pool.Acquire(e.Packet.chaddr);
+            e.Reply = lease != null
+                ? Dhcpv4Reply.CreateAck(e.Packet, lease, config)
+                : Dhcpv4Reply.CreateNak(e.Packet, config);
+            break;
+        case Dhcpv4MessageType.Release:
+            pool.Release(e.Packet.chaddr);
+            break;
+    }
 };
 
-DHCPv4Packet dhcpPacket = new DHCPv4Packet
-{
-    op = 0x02,
-    htype = 0x01,
-    hlen = 0x06,
-    xid = new byte[] {0x00, 0x01, 0x02, 0x03 },
-    secs = 0x00,
-    ciaddr = IPAddress.Parse("").GetAddressBytes(),
-    yiaddr = IPAddress.Parse("").GetAddressBytes(),
-    siaddr = IPAddress.Parse("").GetAddressBytes(),
-    chaddr = PhysicalAddress.Parse("").GetAddressBytes(),
-    dhcpOptions = dhcpMessageTypeOption.buildDhcpOption().Concat(dhcpServerIdentifierOption.buildDhcpOption()).ToArray(),
-};
-
-byte[] send_buffer = dhcpDiscoveryPacket.buildPacket();
-sock.SendTo(send_buffer, endPoint);
+await server.RunAsync(CancellationToken.None);
 ```
 
-## NuGet
-Package Manager
-```
-PM> Install-Package DhcpDotNet -Version 2.0.5
-```
+A complete, runnable version lives in [`samples/DhcpServerSample`](DhcpDotNet/samples/DhcpServerSample).
 
-.NET CLI
-```
-> dotnet add package DhcpDotNet --version 2.0.5
-```
-<a href="https://www.nuget.org/packages/DhcpDotNet/">NuGet-Page</a>
+### Running on Linux
 
-## Latest Version and Changelog
-Version: 2.0.5
+Binding to UDP port 67 is privileged. Either run as root:
 
-```
-V 2.0.5
-- Changed NuGet licence
-
-V 2.0.4
-- Fixed missing code in parsePacket-Method
-
-V 2.0.3
-- Full support for DHCPv6. Fixed several performance down grades. Switch from linq to Binary reader/writer.
-
-V 2.0.2
-- Renamed class and methods with "v4". Dhcp with IPv6 comming soon...
-
-V. 2.0.1
-- Added dhcpOption parsing support. DhcpDotNet is now able to parse incoming DhcpPackets and their DhcpOptions. You can read each DhcpOption cotained in a DhcpPacket. This allows you to read all information provided by the options above listed.
-- Renamed DhcpPacket-Bytes. Each byte or byte-array in a DhcpPacket is now named as in the RFC 2132.
-- Added the possibility to define DhcpOptions with an enmu or single byte. This offers more flexibility and simplicity at the same time.
+```bash
+cd DhcpDotNet/samples/DhcpServerSample
+sudo dotnet run -- 192.168.50.1
 ```
 
-## Copyright
-The contents and works in this software created by the software operators are subject to German copyright law. The reproduction, editing, distribution and any kind of use outside the limits of copyright law require the written consent of the respective author or creator. Downloads and copies of this software are only permitted for private, non-commercial use.
+…or grant the built binary the bind capability once so it can run unprivileged:
 
-Insofar as the content on this software was not created by the operator, the copyrights of third parties are observed. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. If we become aware of any infringements, we will remove such contents immediately.
+```bash
+dotnet build -c Release
+sudo setcap 'cap_net_bind_service=+ep' bin/Release/net8.0/DhcpServerSample
+./bin/Release/net8.0/DhcpServerSample 192.168.50.1
+```
 
-Source: [eRecht24.de](https://www.e-recht24.de/)
+> ⚠️ Do **not** run a second DHCP server on a network that already has one unless you know exactly
+> what you are doing — it will interfere with existing clients.
+
+## DHCPv6
+
+`Dhcpv6Packet`, `Dhcpv6Option`, `Dhcpv6MessageType` and `Dhcpv6OptionIds` mirror the DHCPv4 API for
+building and parsing DHCPv6 messages (RFC 8415). Option codes and lengths are encoded as 2-octet
+big-endian values per the spec.
+
+## Changelog
+
+### 3.0.0
+- Modernised the project to SDK-style multi-targeting (**.NET Standard 2.0 + .NET 8.0**), C# `latest`,
+  nullable reference types and XML docs.
+- **New:** high-level `Dhcpv4Server` async host, `Dhcpv4LeasePool` address pool, `Dhcpv4Reply`
+  OFFER/ACK/NAK builder and `Dhcpv4ServerConfiguration` — build a DHCP server with a handful of lines.
+- **New:** `Dhcpv4MessageType` / `Dhcpv6MessageType` enums and `getOptions()` / `getMessageType()` helpers.
+- **Fixed:** `buildPacket()` no longer appends stray padding bytes (`GetBuffer()` → `ToArray()`).
+- **Fixed:** DHCPv6 classes are now `public` and encode option code/length correctly (2-octet big-endian).
+- **Fixed:** more robust option parsing (handles Pad/End, guards against truncated/oversized input).
+- Added an xUnit test suite and a runnable Linux DHCP server sample.
+- Removed the legacy, Windows-only Visual Studio example projects and the vendored `packages/` folder.
+
+Older DhcpDotNet 2.x releases are available on [NuGet](https://www.nuget.org/packages/DhcpDotNet/).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and pull requests are welcome.
+
+## License
+
+DhcpDotNet is released under the [MIT License](LICENSE).
 
 ## Author
-This developer and the copyright holder of this library is <a href="https://github.com/maxlluky">MaxlLuky</a>
+
+Created and maintained by [MaxlLuky](https://github.com/maxlluky).
