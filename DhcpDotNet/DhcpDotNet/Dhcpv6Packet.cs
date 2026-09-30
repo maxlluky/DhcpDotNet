@@ -1,17 +1,22 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace DhcpDotNet
 {
     /// <summary>
-    /// Creates an empty predefined DHCPv6 packet (Advertise) in the form of a byte array. Please visit RFC 8415 for detaied information: https://tools.ietf.org/html/rfc8415
+    /// Represents a DHCPv6 message and provides methods to build it into a byte array or to parse a
+    /// received UDP payload back into its fields. See RFC 8415 for detailed information:
+    /// https://tools.ietf.org/html/rfc8415
     /// </summary>
-    class Dhcpv6Packet
+    public class Dhcpv6Packet
     {
         /// <summary>
-        /// Identifies the DHCP message type; the available message types are listed in Section 7.3 (RFC 8145). A 1-octet field.
+        /// Identifies the DHCPv6 message type; see <see cref="Dhcpv6MessageType"/> and section 7.3 of
+        /// RFC 8415. A 1-octet field.
         /// </summary>
-        public byte msgtype { get; set; } = 0x02;
+        public byte msgtype { get; set; } = (byte)Dhcpv6MessageType.ADVERTISE;
 
         /// <summary>
         /// The transaction ID for this message exchange. A 3-octet field.
@@ -19,106 +24,190 @@ namespace DhcpDotNet
         public byte[] transactionid { get; set; } = new byte[3];
 
         /// <summary>
-        /// Options carried in this message; options are described in Section 21 (RFC 8145). A variable-length field (4 octets less than the size of the message).
+        /// Options carried in this message. Build them with <see cref="Dhcpv6Option"/>. A variable-length field.
         /// </summary>
-        public byte[] options { get; set; } = new byte[] { };
+        public byte[] options { get; set; } = Array.Empty<byte>();
 
         /// <summary>
-        /// Creates a byte array in the form of a DHCPv6 payload, which can be sent via a UDP datagram. 
+        /// Creates a byte array in the form of a DHCPv6 payload, which can be sent via a UDP datagram.
         /// </summary>
-        /// <returns></returns>
         public byte[] buildPacket()
         {
             using (MemoryStream memoryStream = new MemoryStream())
+            using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
             {
-                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
-                {
-                    binaryWriter.Write(msgtype);
-                    binaryWriter.Write(transactionid);
-                    binaryWriter.Write(options);
-                }
-                memoryStream.Flush();
+                binaryWriter.Write(msgtype);
+                binaryWriter.Write(transactionid);
+                binaryWriter.Write(options);
+                binaryWriter.Flush();
 
-                return memoryStream.GetBuffer();
+                return memoryStream.ToArray();
             }
         }
 
         /// <summary>
-        /// Parses a raw-DHCPv6 payload. The return value indicates whether the process was successful or not. 
+        /// Parses a raw DHCPv6 payload. The return value indicates whether the process was successful.
         /// </summary>
-        /// <param name="pPayload">The entire Udp payload must be transferred</param>
-        /// <returns></returns>
+        /// <param name="pPayload">The entire UDP payload.</param>
         public bool parsePacket(byte[] pPayload)
         {
+            if (pPayload == null || pPayload.Length < 4)
+            {
+                return false;
+            }
+
             try
             {
                 using (MemoryStream memoryStream = new MemoryStream(pPayload))
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                 {
-                    using (BinaryReader binaryReader = new BinaryReader(memoryStream))
-                    {
-                        msgtype = binaryReader.ReadByte();
-                        transactionid = binaryReader.ReadBytes(3);
-                        options = binaryReader.ReadBytes(pPayload.Length - 4);
-                    }
+                    msgtype = binaryReader.ReadByte();
+                    transactionid = binaryReader.ReadBytes(3);
+                    options = binaryReader.ReadBytes(pPayload.Length - 4);
                 }
+
                 return true;
             }
-            catch (Exception) { }
+            catch (Exception eX)
+            {
+                Debug.WriteLine("DhcpDotNet-Exception: " + eX.Message);
+            }
+
             return false;
         }
+
+        /// <summary>
+        /// Parses and returns the list of DHCPv6 options contained in this packet's <see cref="options"/>.
+        /// </summary>
+        public List<Dhcpv6Option> getOptions() => new Dhcpv6Option().parseDhcpOptions(options);
     }
 
     /// <summary>
-    /// Create a DHCPv6 option, as listed in RFC 8415[24] and IANA registry with optionId-Enum 
+    /// Create a DHCPv6 option, as listed in RFC 8415 and the IANA registry via the <see cref="Dhcpv6OptionIds"/> enum.
     /// </summary>
-    class Dhcpv6Option
+    public class Dhcpv6Option
     {
         /// <summary>
-        /// Define the DHCPv6 options to be created by name
+        /// The DHCPv6 option to be created, by name.
         /// </summary>
-        public Dhcpv6OptionIds optionId { get; set; } = new Dhcpv6OptionIds();
+        public Dhcpv6OptionIds optionId { get; set; }
 
         /// <summary>
-        /// Represents the optionId (enum) in bytes. This field is not required if you set optionId with enum.
+        /// The 2-octet option code in network byte order. Set automatically from <see cref="optionId"/>
+        /// when building; also populated when parsing.
         /// </summary>
         public byte[] optionIdBytes { get; set; } = new byte[2];
 
         /// <summary>
-        /// Define the required length for the optionValue
+        /// The 2-octet option length in network byte order. Set automatically from the value when building.
         /// </summary>
         public byte[] optionLength { get; set; } = new byte[2];
 
         /// <summary>
-        /// Define the value for the option e.g. subnet mask
+        /// The option value.
         /// </summary>
-        public byte[] optionValue { get; set; } = new byte[] { };
+        public byte[] optionValue { get; set; } = Array.Empty<byte>();
 
         /// <summary>
-        /// Create the DHCPv6 option as byte array. Is then specified as an option in the DhcpPacket.
+        /// Creates the DHCPv6 option as a byte array to be appended to a packet's options section.
+        /// DHCPv6 encodes option-code and option-len as 2 octets each, in network (big-endian) byte order.
         /// </summary>
-        /// <returns></returns>
         public byte[] buildDhcpOption()
         {
             if (Enum.IsDefined(typeof(Dhcpv6OptionIds), optionId))
             {
-                optionIdBytes = BitConverter.GetBytes((int)optionId);
+                optionIdBytes = GetBigEndianUInt16((ushort)optionId);
             }
+
+            optionLength = GetBigEndianUInt16((ushort)optionValue.Length);
 
             using (MemoryStream memoryStream = new MemoryStream())
+            using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
             {
-                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
-                {
-                    binaryWriter.Write(optionIdBytes);
-                    binaryWriter.Write(optionLength);
-                    binaryWriter.Write(optionValue);
-                }
-                memoryStream.Flush();
+                binaryWriter.Write(optionIdBytes);
+                binaryWriter.Write(optionLength);
+                binaryWriter.Write(optionValue);
+                binaryWriter.Flush();
 
-                return memoryStream.GetBuffer();
+                return memoryStream.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Parses the raw options section of a DHCPv6 packet into a list of <see cref="Dhcpv6Option"/>.
+        /// </summary>
+        public List<Dhcpv6Option> parseDhcpOptions(byte[] pPayload)
+        {
+            List<Dhcpv6Option> dhcpOptionList = new List<Dhcpv6Option>();
+
+            if (pPayload == null || pPayload.Length < 4)
+            {
+                return dhcpOptionList;
+            }
+
+            int index = 0;
+            while (index + 4 <= pPayload.Length)
+            {
+                byte[] code = new byte[] { pPayload[index], pPayload[index + 1] };
+                byte[] lengthBytes = new byte[] { pPayload[index + 2], pPayload[index + 3] };
+                int length = (lengthBytes[0] << 8) | lengthBytes[1];
+                index += 4;
+
+                if (index + length > pPayload.Length)
+                {
+                    // Truncated option; stop rather than reading past the buffer.
+                    break;
+                }
+
+                byte[] value = new byte[length];
+                Array.Copy(pPayload, index, value, 0, length);
+                index += length;
+
+                ushort codeValue = (ushort)((code[0] << 8) | code[1]);
+
+                dhcpOptionList.Add(new Dhcpv6Option
+                {
+                    optionIdBytes = code,
+                    optionId = Enum.IsDefined(typeof(Dhcpv6OptionIds), codeValue)
+                        ? (Dhcpv6OptionIds)codeValue
+                        : default,
+                    optionLength = lengthBytes,
+                    optionValue = value,
+                });
+            }
+
+            return dhcpOptionList;
+        }
+
+        private static byte[] GetBigEndianUInt16(ushort value)
+        {
+            return new byte[] { (byte)(value >> 8), (byte)(value & 0xff) };
         }
     }
 
+    /// <summary>
+    /// DHCPv6 message types. See section 7.3 of RFC 8415.
+    /// </summary>
+    public enum Dhcpv6MessageType : byte
+    {
+        SOLICIT = 1,
+        ADVERTISE = 2,
+        REQUEST = 3,
+        CONFIRM = 4,
+        RENEW = 5,
+        REBIND = 6,
+        REPLY = 7,
+        RELEASE = 8,
+        DECLINE = 9,
+        RECONFIGURE = 10,
+        INFORMATION_REQUEST = 11,
+        RELAY_FORW = 12,
+        RELAY_REPL = 13,
+    }
+
+    /// <summary>
+    /// DHCPv6 option ids as listed in RFC 8415 and the IANA registry.
+    /// </summary>
     public enum Dhcpv6OptionIds : ushort
     {
         CLIENTID = 1,
@@ -152,7 +241,6 @@ namespace DhcpDotNet
         NISP_DOMAIN_NAME = 30,
         SNTP_SERVERS = 31,
         INFORMATION_REFRESH_TIME = 32,
-
         BCMCS_SERVER_D = 33,
         BCMCS_SERVER_A = 34,
         GEOCONF_CIVIC = 36,
@@ -202,9 +290,7 @@ namespace DhcpDotNet
         LINK_ADDRESS = 80,
         RADIUS = 81,
         SOL_MAX_RT = 82,
-
         INF_MAX_RT = 83,
-
         ADDRSEL = 84,
         ADDRSEL_TABLE = 85,
         V6_PCP_SERVER = 86,
