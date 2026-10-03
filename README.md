@@ -98,14 +98,16 @@ var pool = new Dhcpv4LeasePool(
     IPAddress.Parse("192.168.50.100"),
     IPAddress.Parse("192.168.50.200"),
     config.LeaseTime);
+pool.Exclude(config.ServerIdentifier);   // never hand out the server's own address
 
-using var server = new Dhcpv4Server();
+// Serve one interface only; new Dhcpv4Server() listens on all of them.
+using var server = Dhcpv4Server.ForInterface("eth0");
 server.PacketReceived += (_, e) =>
 {
     switch (e.MessageType)
     {
         case Dhcpv4MessageType.Discover:
-            var offer = pool.Acquire(e.Packet.chaddr);
+            var offer = pool.Offer(e.Packet.chaddr);   // short reservation until the client requests it
             if (offer != null) e.Reply = Dhcpv4Reply.CreateOffer(e.Packet, offer, config);
             break;
         case Dhcpv4MessageType.Request:
@@ -120,8 +122,13 @@ server.PacketReceived += (_, e) =>
     }
 };
 
-await server.RunAsync(CancellationToken.None);
+using var cts = new CancellationTokenSource();
+Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
+await server.RunAsync(cts.Token);   // returns on Ctrl+C
 ```
+
+`Dhcpv4LeasePool` also offers `Decline` (block an address a client reports as already in use),
+`GetLease` (look up a client's lease without renewing it) and `OfferTime` (how long an offer is held).
 
 A complete, runnable version lives in [`samples/DhcpServerSample`](DhcpDotNet/samples/DhcpServerSample).
 
@@ -131,7 +138,7 @@ Binding to UDP port 67 is privileged. Either run as root:
 
 ```bash
 cd DhcpDotNet/samples/DhcpServerSample
-sudo dotnet run -- 192.168.50.1
+sudo dotnet run -- 192.168.50.1 eth0
 ```
 
 …or grant the built binary the bind capability once so it can run unprivileged:
@@ -139,7 +146,7 @@ sudo dotnet run -- 192.168.50.1
 ```bash
 dotnet build -c Release
 sudo setcap 'cap_net_bind_service=+ep' bin/Release/net8.0/DhcpServerSample
-./bin/Release/net8.0/DhcpServerSample 192.168.50.1
+./bin/Release/net8.0/DhcpServerSample 192.168.50.1 eth0
 ```
 
 > ⚠️ Do **not** run a second DHCP server on a network that already has one unless you know exactly
@@ -162,6 +169,15 @@ big-endian values per the spec.
 - **Fixed:** `buildPacket()` no longer appends stray padding bytes (`GetBuffer()` → `ToArray()`).
 - **Fixed:** DHCPv6 classes are now `public` and encode option code/length correctly (2-octet big-endian).
 - **Fixed:** more robust option parsing (handles Pad/End, guards against truncated/oversized input).
+- **New:** `Dhcpv4Server.ForInterface(...)` serves a single network interface (SO_BINDTODEVICE on Linux,
+  IP_BOUND_IF on macOS, interface address on Windows).
+- **New:** `Dhcpv4LeasePool.Offer` (short offer reservation, `OfferTime`), `Decline`, `Exclude` and `GetLease`.
+- **Fixed:** `Dhcpv4Server.RunAsync` now stops as soon as its token is cancelled instead of waiting for the
+  next packet; `StopAsync`/`Dispose` are safe to call repeatedly and the server can be restarted.
+- **Fixed:** `Dhcpv4Option.optionId` and `optionIdBytes` share one value, so options missing from
+  `Dhcpv4OptionIds` (e.g. 252) can be built and parsed unknown options rebuild with their own code.
+- Replies sent by `Dhcpv4Server` are padded to the 300 byte BOOTP minimum; on Windows ICMP "port unreachable"
+  no longer surfaces as receive errors.
 - Added an xUnit test suite and a runnable Linux DHCP server sample.
 - Removed the legacy, Windows-only Visual Studio example projects and the vendored `packages/` folder.
 

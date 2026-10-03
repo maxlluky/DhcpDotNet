@@ -95,6 +95,38 @@ namespace DhcpDotNet.Tests
         }
 
         [Fact]
+        public void BuildDhcpOption_SupportsCodesMissingFromEnum()
+        {
+            var option = new Dhcpv4Option
+            {
+                optionIdBytes = 252, // WPAD, not part of Dhcpv4OptionIds
+                optionValue = new byte[] { 0x41 },
+            };
+
+            Assert.Equal(new byte[] { 252, 1, 0x41 }, option.buildDhcpOption());
+        }
+
+        [Fact]
+        public void ParsedUnknownOption_RebuildsWithItsOwnCode()
+        {
+            var option = new Dhcpv4Option().parseDhcpOptions(new byte[] { 252, 1, 0x41, 255 }).Single();
+
+            Assert.Equal(252, option.optionIdBytes);
+            Assert.Equal((Dhcpv4OptionIds)252, option.optionId);
+            Assert.Equal(new byte[] { 252, 1, 0x41 }, option.buildDhcpOption());
+        }
+
+        [Fact]
+        public void OptionIdAndOptionIdBytes_StayInSync()
+        {
+            var option = new Dhcpv4Option { optionId = Dhcpv4OptionIds.Router };
+            Assert.Equal(3, option.optionIdBytes);
+
+            option.optionIdBytes = 6;
+            Assert.Equal(Dhcpv4OptionIds.DomainNameServer, option.optionId);
+        }
+
+        [Fact]
         public void Reply_CreateOffer_EchoesXidAndSetsYiaddr()
         {
             var request = new Dhcpv4Packet
@@ -245,6 +277,92 @@ namespace DhcpDotNet.Tests
             Assert.True(pool.Release(client1));
             IPAddress? reused = pool.Acquire(new byte[] { 0x02 });
             Assert.Equal(a, reused);
+        }
+
+        [Fact]
+        public void Offer_ReservationEndsAfterOfferTime()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.10"),
+                System.TimeSpan.FromHours(12));
+            pool.OfferTime = System.TimeSpan.Zero; // the offer expires immediately
+
+            Assert.Equal(IPAddress.Parse("10.0.0.10"), pool.Offer(new byte[] { 0x01 }));
+            Assert.Equal(IPAddress.Parse("10.0.0.10"), pool.Offer(new byte[] { 0x02 }));
+        }
+
+        [Fact]
+        public void Offer_IsShortAndAcquireTurnsItIntoAFullLease()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.20"),
+                System.TimeSpan.FromHours(12));
+            byte[] client = { 0x01 };
+
+            IPAddress? offered = pool.Offer(client);
+            Assert.True(pool.GetLease(client)!.ExpiresAt < System.DateTimeOffset.UtcNow.AddMinutes(2));
+
+            Assert.Equal(offered, pool.Acquire(client));
+            Assert.True(pool.GetLease(client)!.ExpiresAt > System.DateTimeOffset.UtcNow.AddHours(11));
+        }
+
+        [Fact]
+        public void Offer_NeverShortensAnExistingLease()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.20"),
+                System.TimeSpan.FromHours(12));
+            byte[] client = { 0x01 };
+
+            IPAddress? leased = pool.Acquire(client);
+            Assert.Equal(leased, pool.Offer(client));
+            Assert.True(pool.GetLease(client)!.ExpiresAt > System.DateTimeOffset.UtcNow.AddHours(11));
+        }
+
+        [Fact]
+        public void GetLease_ReturnsNullForUnknownClient()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.20"),
+                System.TimeSpan.FromHours(12));
+
+            Assert.Null(pool.GetLease(new byte[] { 0x01 }));
+            Assert.Empty(pool.GetActiveLeases());
+        }
+
+        [Fact]
+        public void Decline_BlocksTheAddress()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.11"),
+                System.TimeSpan.FromHours(12));
+            byte[] client = { 0x01 };
+            IPAddress leased = pool.Acquire(client)!;
+
+            Assert.False(pool.Decline(client, IPAddress.Parse("10.0.0.11"))); // not the client's address
+            Assert.True(pool.Decline(client, leased));
+
+            Assert.Null(pool.GetLease(client));
+            Assert.Equal(IPAddress.Parse("10.0.0.11"), pool.Acquire(client));
+            Assert.Null(pool.Acquire(new byte[] { 0x02 }, leased)); // blocked, and nothing else left
+        }
+
+        [Fact]
+        public void Exclude_KeepsAddressOutOfThePool()
+        {
+            var pool = new Dhcpv4LeasePool(
+                IPAddress.Parse("10.0.0.10"),
+                IPAddress.Parse("10.0.0.11"),
+                System.TimeSpan.FromHours(12));
+            pool.Exclude(IPAddress.Parse("10.0.0.10"));
+
+            Assert.Equal(IPAddress.Parse("10.0.0.11"), pool.Acquire(new byte[] { 0x01 }, IPAddress.Parse("10.0.0.10")));
+            Assert.Null(pool.Offer(new byte[] { 0x02 }));
         }
     }
 }
