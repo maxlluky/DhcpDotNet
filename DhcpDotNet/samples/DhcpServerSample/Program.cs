@@ -8,7 +8,10 @@ using DhcpDotNet;
 // It listens on UDP :67, offers addresses from a pool and answers DISCOVER with
 // OFFER and REQUEST with ACK. Run it on Linux with:
 //
-//     sudo dotnet run
+//     sudo dotnet run -- <server-ip> [interface]
+//
+// Pass the interface (e.g. eth0) on a machine with more than one network so the
+// server only answers clients on that network.
 //
 // or, to run the built binary without root every time, grant the bind capability
 // once:
@@ -35,13 +38,14 @@ var config = new Dhcpv4ServerConfiguration
 config.DnsServers.Add(IPAddress.Parse("1.1.1.1"));
 config.DnsServers.Add(IPAddress.Parse("8.8.8.8"));
 
-// Address pool to hand out (inclusive range).
+// Address pool to hand out (inclusive range). The server's own address is never handed out.
 var pool = new Dhcpv4LeasePool(
     rangeStart: IPAddress.Parse("192.168.50.100"),
     rangeEnd: IPAddress.Parse("192.168.50.200"),
     leaseTime: config.LeaseTime);
+pool.Exclude(serverAddress);
 
-using var server = new Dhcpv4Server();
+using Dhcpv4Server server = args.Length > 1 ? Dhcpv4Server.ForInterface(args[1]) : new Dhcpv4Server();
 
 server.Error += (_, ex) => Console.WriteLine($"[error] {ex.Message}");
 
@@ -54,7 +58,8 @@ server.PacketReceived += (_, e) =>
     {
         case Dhcpv4MessageType.Discover:
         {
-            IPAddress? offer = pool.Acquire(clientId, GetRequestedAddress(e.Packet));
+            // Offer only reserves the address briefly until the client requests it.
+            IPAddress? offer = pool.Offer(clientId, GetRequestedAddress(e.Packet));
             if (offer == null)
             {
                 Console.WriteLine($"[discover] {mac} -> pool exhausted, ignoring");
@@ -86,6 +91,17 @@ server.PacketReceived += (_, e) =>
             Console.WriteLine($"[release]  {mac} -> lease released");
             break;
 
+        case Dhcpv4MessageType.Decline:
+        {
+            // The client found the address in use by another device; block it for one lease time.
+            IPAddress? declined = GetRequestedAddress(e.Packet);
+            if (declined != null && pool.Decline(clientId, declined))
+            {
+                Console.WriteLine($"[decline]  {mac} -> {declined} is in use elsewhere, blocked");
+            }
+            break;
+        }
+
         default:
             Console.WriteLine($"[{e.MessageType}] from {mac}");
             break;
@@ -103,11 +119,8 @@ Console.WriteLine($"DHCPv4 server listening on :67 (server id {serverAddress}). 
 
 try
 {
+    // Returns once Ctrl+C cancels the token.
     await server.RunAsync(cts.Token);
-}
-catch (OperationCanceledException)
-{
-    // graceful shutdown
 }
 catch (SocketException ex)
 {

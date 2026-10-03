@@ -1,6 +1,10 @@
 using System;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +22,9 @@ namespace DhcpDotNet
     /// Cross-platform note: binding to UDP port 67 is privileged. On Linux run the process as root or
     /// grant the binary the capability once with:
     /// <c>sudo setcap 'cap_net_bind_service=+ep' /path/to/your/app</c>.
+    ///
+    /// On a machine with more than one network, create the server with <see cref="ForInterface(string, int)"/>
+    /// so it only answers clients on that interface and its broadcasts leave through it.
     /// </summary>
     public sealed class Dhcpv4Server : IDisposable
     {
@@ -27,8 +34,15 @@ namespace DhcpDotNet
         /// <summary>Standard DHCP client port.</summary>
         public const int ClientPort = 68;
 
+        // RFC 1542: some BOOTP/DHCP clients drop replies shorter than the original 300 byte BOOTP message.
+        private const int MinimumReplySize = 300;
+
+        // Windows: stop ICMP "port unreachable" answers to our unicasts from failing the next receive.
+        private const int SioUdpConnReset = unchecked((int)0x9800000C);
+
         private readonly IPAddress _bindAddress;
         private readonly int _listenPort;
+        private readonly NetworkInterface? _networkInterface;
         private UdpClient? _udpClient;
         private CancellationTokenSource? _cts;
         private Task? _receiveLoop;
@@ -44,6 +58,36 @@ namespace DhcpDotNet
             _listenPort = listenPort;
         }
 
+        private Dhcpv4Server(NetworkInterface networkInterface, int listenPort)
+        {
+            _networkInterface = networkInterface ?? throw new ArgumentNullException(nameof(networkInterface));
+            _bindAddress = IPAddress.Any;
+            _listenPort = listenPort;
+        }
+
+        /// <summary>
+        /// Creates a server that only receives from and sends through one network interface. Without this a
+        /// server bound to all interfaces answers clients on every network the machine is connected to.
+        /// Uses SO_BINDTODEVICE on Linux, IP_BOUND_IF on macOS and the interface's IPv4 address on Windows.
+        /// Linux and macOS need the net8.0 build of this library.
+        /// </summary>
+        /// <param name="interfaceName">Interface name or id, e.g. <c>eth0</c> or <c>Ethernet</c>.</param>
+        /// <param name="listenPort">UDP port to listen on. Defaults to 67.</param>
+        public static Dhcpv4Server ForInterface(string interfaceName, int listenPort = ServerPort)
+        {
+            NetworkInterface? networkInterface = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(nic =>
+                string.Equals(nic.Name, interfaceName, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(nic.Id, interfaceName, StringComparison.OrdinalIgnoreCase));
+
+            return ForInterface(networkInterface ?? throw new ArgumentException($"Network interface '{interfaceName}' not found.", nameof(interfaceName)), listenPort);
+        }
+
+        /// <inheritdoc cref="ForInterface(string, int)"/>
+        /// <param name="networkInterface">The interface to serve.</param>
+        /// <param name="listenPort">UDP port to listen on. Defaults to 67.</param>
+        public static Dhcpv4Server ForInterface(NetworkInterface networkInterface, int listenPort = ServerPort)
+            => new Dhcpv4Server(networkInterface, listenPort);
+
         /// <summary>Raised for every successfully parsed DHCPv4 packet. Return a reply to send it back.</summary>
         public event EventHandler<Dhcpv4PacketReceivedEventArgs>? PacketReceived;
 
@@ -56,54 +100,42 @@ namespace DhcpDotNet
         /// <summary>
         /// Starts listening in the background and returns immediately. Call <see cref="StopAsync"/> to stop.
         /// </summary>
-        public void Start()
-        {
-            if (IsRunning)
-            {
-                throw new InvalidOperationException("The server is already running.");
-            }
-
-            _cts = new CancellationTokenSource();
-            _udpClient = CreateSocket();
-            _receiveLoop = ReceiveLoopAsync(_udpClient, _cts.Token);
-        }
+        public void Start() => StartCore(CancellationToken.None);
 
         /// <summary>
-        /// Runs the receive loop until the provided token is cancelled. Useful for hosting the server
-        /// directly on a long-lived task (for example from <c>Main</c>).
+        /// Runs the receive loop until the provided token is cancelled, then closes the socket and returns
+        /// normally. Useful for hosting the server directly on a long-lived task (for example from <c>Main</c>).
         /// </summary>
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            if (IsRunning)
-            {
-                throw new InvalidOperationException("The server is already running.");
-            }
+            Task receiveLoop = StartCore(cancellationToken);
 
-            _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _udpClient = CreateSocket();
-            _receiveLoop = ReceiveLoopAsync(_udpClient, _cts.Token);
-            await _receiveLoop.ConfigureAwait(false);
+            try
+            {
+                await receiveLoop.ConfigureAwait(false);
+            }
+            finally
+            {
+                await StopAsync().ConfigureAwait(false);
+            }
         }
 
         /// <summary>Stops the receive loop and releases the socket.</summary>
         public async Task StopAsync()
         {
-            _cts?.Cancel();
+            // Take ownership first so concurrent or repeated calls do nothing twice.
+            CancellationTokenSource? cts = Interlocked.Exchange(ref _cts, null);
+            UdpClient? udpClient = Interlocked.Exchange(ref _udpClient, null);
+            Task? receiveLoop = Interlocked.Exchange(ref _receiveLoop, null);
 
-            try
-            {
-                _udpClient?.Close();
-            }
-            catch
-            {
-                // ignored; closing unblocks the pending ReceiveAsync
-            }
+            cts?.Cancel();
+            udpClient?.Dispose(); // aborts a pending receive
 
-            if (_receiveLoop != null)
+            if (receiveLoop != null)
             {
                 try
                 {
-                    await _receiveLoop.ConfigureAwait(false);
+                    await receiveLoop.ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
@@ -111,23 +143,17 @@ namespace DhcpDotNet
                 }
             }
 
-            _receiveLoop = null;
-            _cts?.Dispose();
-            _cts = null;
-            _udpClient = null;
+            cts?.Dispose();
         }
 
         /// <summary>
-        /// Sends a raw DHCPv4 payload to the given endpoint.
+        /// Sends a raw DHCPv4 payload to the given endpoint. Payloads shorter than the 300 byte BOOTP
+        /// minimum are padded with zeros.
         /// </summary>
-        public async Task SendAsync(byte[] payload, IPEndPoint destination)
+        public Task SendAsync(byte[] payload, IPEndPoint destination)
         {
-            if (_udpClient == null)
-            {
-                throw new InvalidOperationException("The server socket is not open. Call Start or RunAsync first.");
-            }
-
-            await _udpClient.SendAsync(payload, payload.Length, destination).ConfigureAwait(false);
+            UdpClient udpClient = _udpClient ?? throw new InvalidOperationException("The server socket is not open. Call Start or RunAsync first.");
+            return SendAsync(udpClient, payload, destination);
         }
 
         /// <summary>
@@ -139,18 +165,98 @@ namespace DhcpDotNet
             return SendAsync(reply.buildPacket(), new IPEndPoint(IPAddress.Broadcast, ClientPort));
         }
 
+        private static async Task SendAsync(UdpClient udpClient, byte[] payload, IPEndPoint destination)
+        {
+            if (payload.Length < MinimumReplySize)
+            {
+                // Zero bytes after the End option are padding.
+                Array.Resize(ref payload, MinimumReplySize);
+            }
+
+            await udpClient.SendAsync(payload, payload.Length, destination).ConfigureAwait(false);
+        }
+
+        private Task StartCore(CancellationToken cancellationToken)
+        {
+            if (IsRunning)
+            {
+                throw new InvalidOperationException("The server is already running.");
+            }
+
+            _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _udpClient = CreateSocket();
+            _receiveLoop = ReceiveLoopAsync(_udpClient, _cts.Token);
+            return _receiveLoop;
+        }
+
         private UdpClient CreateSocket()
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            socket.EnableBroadcast = true;
-            socket.Bind(new IPEndPoint(_bindAddress, _listenPort));
 
-            return new UdpClient { Client = socket, EnableBroadcast = true };
+            try
+            {
+                socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                socket.EnableBroadcast = true;
+
+                IPAddress bindAddress = _bindAddress;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    socket.IOControl(SioUdpConnReset, new byte[4], null);
+
+                    if (_networkInterface != null)
+                    {
+                        // Windows delivers broadcasts to a socket bound to the interface address and sends from that interface.
+                        bindAddress = GetIPv4Address(_networkInterface);
+                    }
+                }
+                else if (_networkInterface != null)
+                {
+                    // Unix only delivers broadcasts to sockets bound to the wildcard address, so pin the socket to the device instead.
+                    BindToDevice(socket, _networkInterface);
+                }
+
+                socket.Bind(new IPEndPoint(bindAddress, _listenPort));
+                return new UdpClient { Client = socket, EnableBroadcast = true };
+            }
+            catch
+            {
+                socket.Dispose();
+                throw;
+            }
+        }
+
+        private static void BindToDevice(Socket socket, NetworkInterface networkInterface)
+        {
+#if NET
+            if (OperatingSystem.IsLinux())
+            {
+                socket.SetRawSocketOption(1 /* SOL_SOCKET */, 25 /* SO_BINDTODEVICE */, Encoding.ASCII.GetBytes(networkInterface.Name + "\0"));
+                return;
+            }
+
+            if (OperatingSystem.IsMacOS())
+            {
+                int index = networkInterface.GetIPProperties().GetIPv4Properties().Index;
+                socket.SetRawSocketOption(0 /* IPPROTO_IP */, 25 /* IP_BOUND_IF */, BitConverter.GetBytes(index));
+                return;
+            }
+#endif
+            throw new PlatformNotSupportedException("Binding to a network interface is supported on Windows, and on Linux and macOS with the net8.0 build.");
+        }
+
+        private static IPAddress GetIPv4Address(NetworkInterface networkInterface)
+        {
+            return networkInterface.GetIPProperties().UnicastAddresses
+                .Select(unicast => unicast.Address)
+                .FirstOrDefault(address => address.AddressFamily == AddressFamily.InterNetwork)
+                ?? throw new InvalidOperationException($"Network interface '{networkInterface.Name}' has no IPv4 address.");
         }
 
         private async Task ReceiveLoopAsync(UdpClient udpClient, CancellationToken cancellationToken)
         {
+            // A pending receive cannot be cancelled on every target framework; closing the socket aborts it.
+            using CancellationTokenRegistration registration = cancellationToken.Register(udpClient.Dispose);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 UdpReceiveResult result;
@@ -162,9 +268,9 @@ namespace DhcpDotNet
                 {
                     break; // socket closed during shutdown
                 }
-                catch (SocketException) when (cancellationToken.IsCancellationRequested)
+                catch (Exception) when (cancellationToken.IsCancellationRequested)
                 {
-                    break;
+                    break; // the socket was closed to stop the server
                 }
                 catch (Exception ex)
                 {
@@ -195,7 +301,7 @@ namespace DhcpDotNet
                     try
                     {
                         IPEndPoint destination = args.ReplyEndPoint ?? new IPEndPoint(IPAddress.Broadcast, ClientPort);
-                        await SendAsync(args.Reply.buildPacket(), destination).ConfigureAwait(false);
+                        await SendAsync(udpClient, args.Reply.buildPacket(), destination).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
@@ -208,11 +314,15 @@ namespace DhcpDotNet
         /// <inheritdoc />
         public void Dispose()
         {
+            CancellationTokenSource? cts = Interlocked.Exchange(ref _cts, null);
+            UdpClient? udpClient = Interlocked.Exchange(ref _udpClient, null);
+            _receiveLoop = null;
+
             try
             {
-                _cts?.Cancel();
-                _udpClient?.Dispose();
-                _cts?.Dispose();
+                cts?.Cancel();
+                udpClient?.Dispose();
+                cts?.Dispose();
             }
             catch
             {

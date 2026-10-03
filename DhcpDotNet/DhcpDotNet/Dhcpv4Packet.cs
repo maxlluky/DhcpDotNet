@@ -219,13 +219,18 @@ namespace DhcpDotNet
     public class Dhcpv4Option
     {
         /// <summary>
-        /// The DHCPv4 option to be created, by name.
+        /// The DHCPv4 option to be created, by name. Shares its value with <see cref="optionIdBytes"/>;
+        /// codes missing from <see cref="Dhcpv4OptionIds"/> can be set through either property.
         /// </summary>
-        public Dhcpv4OptionIds optionId { get; set; }
+        public Dhcpv4OptionIds optionId
+        {
+            get => (Dhcpv4OptionIds)optionIdBytes;
+            set => optionIdBytes = (byte)value;
+        }
 
         /// <summary>
-        /// The option id as a raw byte. Set automatically from <see cref="optionId"/> when building; also
-        /// populated when parsing.
+        /// The option code as a raw byte, e.g. 252 for an option not listed in <see cref="Dhcpv4OptionIds"/>.
+        /// Shares its value with <see cref="optionId"/>.
         /// </summary>
         public byte optionIdBytes { get; set; }
 
@@ -244,11 +249,6 @@ namespace DhcpDotNet
         /// </summary>
         public byte[] buildDhcpOption()
         {
-            if (Enum.IsDefined(typeof(Dhcpv4OptionIds), optionId))
-            {
-                optionIdBytes = (byte)optionId;
-            }
-
             // Always derive the length from the actual value so callers cannot desynchronise it.
             optionLength = (byte)optionValue.Length;
 
@@ -305,9 +305,6 @@ namespace DhcpDotNet
                 dhcpOptionList.Add(new Dhcpv4Option
                 {
                     optionIdBytes = dhcpOptionId,
-                    optionId = Enum.IsDefined(typeof(Dhcpv4OptionIds), dhcpOptionId)
-                        ? (Dhcpv4OptionIds)dhcpOptionId
-                        : default,
                     optionLength = dhcpOptionValueLength,
                     optionValue = dhcpOptionValue,
                 });
