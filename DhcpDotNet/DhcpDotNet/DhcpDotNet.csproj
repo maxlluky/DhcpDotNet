@@ -1,28 +1,35 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Authors>Marschall TM</Authors>
-    <Copyright>Copyright 2020</Copyright>
+    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package">
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>DhcpDotNet</PackageId>
+    <Version>3.0.0</Version>
+    <Authors>MaxlLuky</Authors>
+    <Company>MaxlLuky</Company>
+    <Copyright>Copyright © MaxlLuky</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/Marschall-dev/DhcpDotNet</RepositoryUrl>
-    <Version>2.0.6</Version>
-    <PackageTags>DHCP, DHCP Packet, DHCP Server, DHCP Client, Dynamic Host Configuration Protocol</PackageTags>
+    <RepositoryUrl>https://github.com/maxlluky/DhcpDotNet</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/maxlluky/DhcpDotNet</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>DHCP;DHCPv4;DHCPv6;DHCP Server;DHCP Client;DHCP Packet;networking;Linux;cross-platform</PackageTags>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageIcon>logo.png</PackageIcon>
-    <Description>Fully managed, cross platform (Windows, Mac, Linux) .NET library for creating DHCP packets. Supports DHCPv4 and DHCPv6.</Description>
-    <PackageProjectUrl>https://github.com/Marschall-dev/DhcpDotNet</PackageProjectUrl>
-    <LangVersion>8.0</LangVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>Fully managed, cross-platform (Windows, macOS, Linux) .NET library for building, parsing, sending and receiving DHCPv4 and DHCPv6 packets. Includes a high-level asynchronous DHCPv4 server host so you can build a DHCP server with a few lines of code.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\logo.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="..\logo.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
 </Project>
