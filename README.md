@@ -4,82 +4,55 @@
 
 # DhcpDotNet
 
-Fully managed, cross-platform (Windows, macOS, **Linux**) .NET library for building, parsing,
-sending and receiving **DHCPv4** and **DHCPv6** packets — plus a high-level asynchronous DHCPv4
-server host so you can stand up a working DHCP server in a few lines of code.
+Managed, cross-platform (Windows, macOS, Linux) .NET library to **build and parse DHCPv4 and DHCPv6
+packets** — plus a small async **DHCPv4 server** to run a working DHCP server in a few lines.
 
-DhcpDotNet follows the [IANA](https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml)
-assignments and RFC 2131 / 2132 (DHCPv4) and RFC 8415 (DHCPv6).
-
-- **Build** DHCPv4 / DHCPv6 packets with full control over every field and option
-- **Parse** received packets and read every option
-- **Send / receive** via the built-in `UdpClient`/`Socket` transport
-- **Serve** leases with the batteries-included `Dhcpv4Server`, `Dhcpv4LeasePool` and `Dhcpv4Reply` helpers
+Follows RFC 2131/2132 (DHCPv4), RFC 8415 (DHCPv6) and the
+[IANA assignments](https://www.iana.org/assignments/bootp-dhcp-parameters/bootp-dhcp-parameters.xhtml).
 
 ## Requirements
 
-- The library targets **.NET Standard 2.0** and **.NET 8.0**, so it runs on .NET 8+, .NET Framework 4.6.1+,
-  and Mono/Xamarin.
-- To build from source you need the [.NET SDK 8.0](https://dotnet.microsoft.com/download) or newer.
-
-## Project layout
-
-```
-DhcpDotNet/
-├─ DhcpDotNet/               # the library (Dhcpv4/Dhcpv6 packets, server, lease pool)
-├─ samples/DhcpServerSample/ # a runnable DHCPv4 server you can start on Linux
-└─ tests/DhcpDotNet.Tests/   # xUnit test suite
-```
-
-## Build & test
+Targets **.NET Standard 2.0** and **.NET 8.0** (runs on .NET 8+, .NET Framework 4.6.1+, Mono/Xamarin).
+Building from source needs the [.NET SDK 8.0](https://dotnet.microsoft.com/download) or newer.
 
 ```bash
-cd DhcpDotNet          # the folder containing DhcpDotNet.sln
+cd DhcpDotNet        # folder containing DhcpDotNet.sln
 dotnet build
 dotnet test
 ```
 
-## Quick start — build a DHCPv4 packet
+## Build and parse a packet
 
 ```csharp
-using System.Net;
 using System.Net.NetworkInformation;
 using DhcpDotNet;
 
-// A DHCP option (here: message type = DISCOVER).
-Dhcpv4Option messageType = new Dhcpv4Option
+var messageType = new Dhcpv4Option
 {
     optionId = Dhcpv4OptionIds.DhcpMessageType,
     optionValue = new byte[] { (byte)Dhcpv4MessageType.Discover },
 };
-// optionLength is derived from the value automatically.
 
-Dhcpv4Packet discover = new Dhcpv4Packet
+var discover = new Dhcpv4Packet
 {
     op = 0x01,                                   // BOOTREQUEST
     xid = new byte[] { 0x00, 0x01, 0x02, 0x03 },
     chaddr = PhysicalAddress.Parse("00-11-22-33-44-55").GetAddressBytes(),
     dhcpOptions = messageType.buildDhcpOption(),
 };
+byte[] payload = discover.buildPacket();         // ready to send over UDP
 
-byte[] payload = discover.buildPacket();          // ready to send over UDP
-```
-
-Parsing works the same way in reverse:
-
-```csharp
-Dhcpv4Packet packet = new Dhcpv4Packet();
+var packet = new Dhcpv4Packet();
 if (packet.parsePacket(payload))
 {
     Dhcpv4MessageType? type = packet.getMessageType();
-    foreach (Dhcpv4Option option in packet.getOptions())
-    {
-        // read each option
-    }
+    foreach (Dhcpv4Option option in packet.getOptions()) { /* ... */ }
 }
 ```
 
-## Quick start — run a DHCPv4 server
+DHCPv6 works the same way with `Dhcpv6Packet`, `Dhcpv6Option`, `Dhcpv6MessageType` and `Dhcpv6OptionIds`.
+
+## Run a DHCPv4 server
 
 ```csharp
 using System.Net;
@@ -95,19 +68,16 @@ var config = new Dhcpv4ServerConfiguration
 config.DnsServers.Add(IPAddress.Parse("1.1.1.1"));
 
 var pool = new Dhcpv4LeasePool(
-    IPAddress.Parse("192.168.50.100"),
-    IPAddress.Parse("192.168.50.200"),
-    config.LeaseTime);
-pool.Exclude(config.ServerIdentifier);   // never hand out the server's own address
+    IPAddress.Parse("192.168.50.100"), IPAddress.Parse("192.168.50.200"), config.LeaseTime);
+pool.Exclude(config.ServerIdentifier);           // never hand out the server's own address
 
-// Serve one interface only; new Dhcpv4Server() listens on all of them.
-using var server = Dhcpv4Server.ForInterface("eth0");
+using var server = Dhcpv4Server.ForInterface("eth0");   // or new Dhcpv4Server() for all interfaces
 server.PacketReceived += (_, e) =>
 {
     switch (e.MessageType)
     {
         case Dhcpv4MessageType.Discover:
-            var offer = pool.Offer(e.Packet.chaddr);   // short reservation until the client requests it
+            var offer = pool.Offer(e.Packet.chaddr);
             if (offer != null) e.Reply = Dhcpv4Reply.CreateOffer(e.Packet, offer, config);
             break;
         case Dhcpv4MessageType.Request:
@@ -124,73 +94,38 @@ server.PacketReceived += (_, e) =>
 
 using var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (_, e) => { e.Cancel = true; cts.Cancel(); };
-await server.RunAsync(cts.Token);   // returns on Ctrl+C
+await server.RunAsync(cts.Token);                // returns on Ctrl+C
 ```
 
-`Dhcpv4LeasePool` also offers `Decline` (block an address a client reports as already in use),
-`GetLease` (look up a client's lease without renewing it) and `OfferTime` (how long an offer is held).
+`Dhcpv4LeasePool` also provides `Decline`, `GetLease` and `OfferTime`.
+A complete version is in [`samples/DhcpServerSample`](DhcpDotNet/samples/DhcpServerSample).
 
-A complete, runnable version lives in [`samples/DhcpServerSample`](DhcpDotNet/samples/DhcpServerSample).
+### Linux
 
-### Running on Linux
-
-Binding to UDP port 67 is privileged. Either run as root:
+UDP port 67 is privileged. Run as root, or grant the binary the bind capability once:
 
 ```bash
 cd DhcpDotNet/samples/DhcpServerSample
-sudo dotnet run -- 192.168.50.1 eth0
-```
-
-…or grant the built binary the bind capability once so it can run unprivileged:
-
-```bash
 dotnet build -c Release
 sudo setcap 'cap_net_bind_service=+ep' bin/Release/net8.0/DhcpServerSample
 ./bin/Release/net8.0/DhcpServerSample 192.168.50.1 eth0
 ```
 
-> ⚠️ Do **not** run a second DHCP server on a network that already has one unless you know exactly
-> what you are doing — it will interfere with existing clients.
-
-## DHCPv6
-
-`Dhcpv6Packet`, `Dhcpv6Option`, `Dhcpv6MessageType` and `Dhcpv6OptionIds` mirror the DHCPv4 API for
-building and parsing DHCPv6 messages (RFC 8415). Option codes and lengths are encoded as 2-octet
-big-endian values per the spec.
+> ⚠️ Don't run a second DHCP server on a network that already has one — it disrupts existing clients.
 
 ## Changelog
 
-### 3.0.0
-- Modernised the project to SDK-style multi-targeting (**.NET Standard 2.0 + .NET 8.0**), C# `latest`,
-  nullable reference types and XML docs.
-- **New:** high-level `Dhcpv4Server` async host, `Dhcpv4LeasePool` address pool, `Dhcpv4Reply`
-  OFFER/ACK/NAK builder and `Dhcpv4ServerConfiguration` — build a DHCP server with a handful of lines.
-- **New:** `Dhcpv4MessageType` / `Dhcpv6MessageType` enums and `getOptions()` / `getMessageType()` helpers.
-- **Fixed:** `buildPacket()` no longer appends stray padding bytes (`GetBuffer()` → `ToArray()`).
-- **Fixed:** DHCPv6 classes are now `public` and encode option code/length correctly (2-octet big-endian).
-- **Fixed:** more robust option parsing (handles Pad/End, guards against truncated/oversized input).
-- **New:** `Dhcpv4Server.ForInterface(...)` serves a single network interface (SO_BINDTODEVICE on Linux,
-  IP_BOUND_IF on macOS, interface address on Windows).
-- **New:** `Dhcpv4LeasePool.Offer` (short offer reservation, `OfferTime`), `Decline`, `Exclude` and `GetLease`.
-- **Fixed:** `Dhcpv4Server.RunAsync` now stops as soon as its token is cancelled instead of waiting for the
-  next packet; `StopAsync`/`Dispose` are safe to call repeatedly and the server can be restarted.
-- **Fixed:** `Dhcpv4Option.optionId` and `optionIdBytes` share one value, so options missing from
-  `Dhcpv4OptionIds` (e.g. 252) can be built and parsed unknown options rebuild with their own code.
-- Replies sent by `Dhcpv4Server` are padded to the 300 byte BOOTP minimum; on Windows ICMP "port unreachable"
-  no longer surfaces as receive errors.
-- Added an xUnit test suite and a runnable Linux DHCP server sample.
-- Removed the legacy, Windows-only Visual Studio example projects and the vendored `packages/` folder.
+**3.0.0**
+- SDK-style project targeting .NET Standard 2.0 + .NET 8.0; nullable reference types, XML docs, xUnit tests.
+- New: `Dhcpv4Server`, `Dhcpv4LeasePool`, `Dhcpv4Reply`, `Dhcpv4ServerConfiguration`, message-type enums,
+  `getOptions()` / `getMessageType()`.
+- Fixed: stray padding in `buildPacket()`, DHCPv6 classes now public with correct 2-octet encoding,
+  more robust option parsing, unknown option codes round-trip.
+- Removed the legacy Windows-only example projects and vendored `packages/`.
 
-Older DhcpDotNet 2.x releases are available on [NuGet](https://www.nuget.org/packages/DhcpDotNet/).
+2.x releases remain available on [NuGet](https://www.nuget.org/packages/DhcpDotNet/).
 
-## Contributing
+## Contributing and license
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and pull requests are welcome.
-
-## License
-
-DhcpDotNet is released under the [MIT License](LICENSE).
-
-## Author
-
+See [CONTRIBUTING.md](CONTRIBUTING.md). Released under the [MIT License](LICENSE).
 Created and maintained by [MaxlLuky](https://github.com/maxlluky).
